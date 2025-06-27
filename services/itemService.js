@@ -108,6 +108,7 @@ export const updateExistingItem = async (itemId, currentUserId, updateData) => {
     if (error instanceof require('objection').ValidationError) {
         throw new ServiceError(`Validation failed during update: ${error.message}`, 400, 'VALIDATION_ERROR_OBJECTION_UPDATE');
     }
+
     console.error('Service Error updating item:', error.message);
     throw new ServiceError(error.message || 'Failed to update item in database.', 500, 'DB_ERROR_UPDATE');
   }

@@ -1,5 +1,7 @@
+
 import Item from '../models/Item.js'; // Objection.js Item 모델 임포트
 import {NotFoundError} from 'objection';
+
 
 
 class ItemRepository {
@@ -22,6 +24,7 @@ class ItemRepository {
       console.error('Error in ItemRepository.create:', error);
       // Objection.js의 ValidationError 등 특정 에러를 그대로 throw 하거나 커스텀 에러로 변환 가능
       throw error;
+
     }
   }
 
@@ -43,27 +46,15 @@ class ItemRepository {
   /**
    * ID로 특정 아이템을 조회합니다.
    * @param {number} id - 조회할 아이템의 ID
-   * @returns {Promise<object|null>} 아이템 객체 또는 찾지 못한 경우 null (Objection은 못찾으면 에러 throw 가능)
-   * @throws {NotFoundError} 아이템을 찾지 못한 경우 (Objection.js 기본 동작)
-   * @throws {Error} 그 외 데이터베이스 오류 발생 시
+   * @returns {Promise<object|null>} 아이템 객체 또는 찾지 못한 경우 null
+   * @throws {Error} 데이터베이스 오류 발생 시
    */
   async findById(id) {
     try {
-      const item = await Item.query().findById(id);
-      // findById는 못 찾으면 NotFoundError를 throw 하거나 undefined를 반환 (설정에 따라 다름)
-      // 여기서는 서비스 계층에서 null 체크를 하므로, 에러를 그대로 전달하거나 null을 반환하도록 조정 가능.
-      // 만약 못 찾았을 때 null을 반환하고 싶다면:
-      // const item = await Item.query().findById(id);
-      // if (!item) return null;
-      // return item;
-      // 또는 서비스에서 NotFoundError를 캐치하도록 함.
-      if (!item) return null; // 서비스 로직과의 호환성을 위해 null 반환 유지
-      return item;
+      const [rows] = await pool.query('SELECT id, name, description, user_id, created_at, updated_at FROM items WHERE id = ?', [id]);
+      return rows.length > 0 ? rows[0] : null;
     } catch (error) {
       console.error('Error in ItemRepository.findById:', error);
-      if (error instanceof NotFoundError) { // 명시적으로 null 반환 또는 에러 재throw
-        return null;
-      }
       throw error;
     }
   }
