@@ -148,6 +148,7 @@ class ItemRepository {
     }
   }
 
+
   /**
    * 커스텀 SQL을 사용하여 모든 아이템을 상점 정보와 함께 조회합니다.
    * @returns {Promise<Array<object>>} 아이템 객체의 배열 (각 아이템은 itemStores 정보를 포함)
@@ -202,6 +203,7 @@ class ItemRepository {
       throw error;
     }
   }
+
 }
 
 export default ItemRepository;

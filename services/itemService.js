@@ -151,6 +151,7 @@ export const findAllItemsWithStoreDetails = async () => {
   }
 };
 
+
 export const findAllItemsWithStoreDetailsCustomSQL = async () => {
   try {
     const itemsWithStores = await itemRepository.findItemsWithStoreInfoCustomSQL();
@@ -160,3 +161,4 @@ export const findAllItemsWithStoreDetailsCustomSQL = async () => {
     throw new ServiceError(error.message || 'Failed to fetch items with store details from database using custom SQL.', 500, 'DB_ERROR_FETCH_ALL_WITH_STORES_CUSTOM_SQL');
   }
 };
+

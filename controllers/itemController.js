@@ -106,6 +106,7 @@ export const getAllItemsWithStoreInfo = async (req, res) => {
   }
 };
 
+
 // GET /items/with-store-custom-sql - 커스텀 SQL을 사용하여 모든 아이템과 상점 정보 함께 조회
 export const getAllItemsWithStoreInfoCustomSQL = async (req, res) => {
   try {
@@ -119,3 +120,4 @@ export const getAllItemsWithStoreInfoCustomSQL = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch items with store info using custom SQL.', error: error.message });
   }
 };
+
