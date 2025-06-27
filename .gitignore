@@ -24,4 +24,7 @@ lerna-debug.log*
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# IDE and editor specific files
 .idea/
+.idx/
