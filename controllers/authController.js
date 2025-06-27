@@ -1,3 +1,6 @@
+
+import * as authService from '../services/authService.js';
+import { ServiceError } from '../services/itemService.js'; // authService에서도 동일한 ServiceError 사용 가능 (또는 authService에 별도 정의)
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
@@ -12,11 +15,13 @@ const users = [
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
 
+
 /**
  * 사용자 로그인 및 토큰 생성
  * POST /auth/token
  * body: { username, password }
  */
+
 export const login = (req, res) => {
   const { username, password } = req.body;
 
@@ -53,6 +58,7 @@ export const login = (req, res) => {
  * POST /auth/validate
  * body: { token }
  */
+
 export const validateToken = (req, res) => {
   const { token } = req.body;
 
