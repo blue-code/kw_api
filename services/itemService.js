@@ -140,3 +140,13 @@ export const deleteExistingItem = async (itemId, currentUserId) => {
     throw new ServiceError(error.message || 'Failed to delete item from database.', 500, 'DB_ERROR_DELETE');
   }
 };
+
+export const findAllItemsWithStoreDetails = async () => {
+  try {
+    const itemsWithStores = await itemRepository.findItemsWithStoreInfo();
+    return itemsWithStores;
+  } catch (error) {
+    console.error('Service Error fetching items with store details:', error.message);
+    throw new ServiceError(error.message || 'Failed to fetch items with store details from database.', 500, 'DB_ERROR_FETCH_ALL_WITH_STORES');
+  }
+};
