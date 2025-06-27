@@ -1,8 +1,5 @@
 import pool from '../config/db.js';
 
-/**
- * @implements {IItemRepository}
- */
 class ItemRepository {
   /**
    * 새 아이템을 생성합니다.
