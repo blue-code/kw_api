@@ -50,14 +50,14 @@ class ItemRepository {
    * @throws {Error} 데이터베이스 오류 발생 시
    */
   async findById(id) {
-    try {
-      const [rows] = await pool.query('SELECT id, name, description, user_id, created_at, updated_at FROM items WHERE id = ?', [id]);
-      return rows.length > 0 ? rows[0] : null;
-    } catch (error) {
-      console.error('Error in ItemRepository.findById:', error);
-      throw error;
+      try {
+        const item = await Item.query().findById(id);
+        return item || null;
+      } catch (error) {
+        console.error('Error in ItemRepository.findById:', error);
+        throw error;
+      }
     }
-  }
 
   /**
    * 특정 사용자의 특정 아이템을 조회합니다. (주로 소유권 확인용)
