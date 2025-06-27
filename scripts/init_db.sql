@@ -20,6 +20,22 @@ CREATE TABLE items (
     INDEX (user_id) -- user_id에 대한 인덱스 추가 (선택 사항)
 );
 
+-- item_stores 테이블이 존재하면 삭제합니다 (개발 편의성을 위해).
+DROP TABLE IF EXISTS item_stores;
+
+-- item_stores 테이블을 생성합니다.
+CREATE TABLE item_stores (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    item_id INT NOT NULL,
+    store_name VARCHAR(255) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    stock INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_item_id FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE,
+    INDEX (item_id)
+);
+
 -- 예시 데이터 추가 (선택 사항)
 -- INSERT INTO items (name, description, user_id) VALUES
 -- ('첫 번째 아이템', '이것은 첫 번째 테스트 아이템입니다.', 1),

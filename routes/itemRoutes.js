@@ -5,6 +5,7 @@ import {
   getItemById,
   updateItemById,
   deleteItemById,
+  getAllItemsWithStoreInfo, // 추가된 컨트롤러 함수 임포트
 } from '../controllers/itemController.js';
 import { verifyToken } from '../middleware/authMiddleware.js';
 
@@ -15,6 +16,9 @@ router.post('/', verifyToken, createItem);
 
 // GET /items - 모든 아이템 조회 (인증 불필요)
 router.get('/', getAllItems);
+
+// GET /items-with-store - 모든 아이템 및 상점 정보 조회 (인증 불필요)
+router.get('/with-store', getAllItemsWithStoreInfo);
 
 // GET /items/:id - 특정 아이템 조회 (인증 불필요)
 router.get('/:id', getItemById);

@@ -1,4 +1,5 @@
 import { Model } from 'objection';
+import ItemStore from './ItemStore.js'; // ItemStore 모델 임포트
 // import User from './User.js'; // 추후 User 모델과의 관계 정의 시 필요
 
 class Item extends Model {
@@ -26,21 +27,29 @@ class Item extends Model {
   }
 
   // (선택 사항) 다른 모델과의 관계 정의
-  // static get relationMappings() {
-  //   // User 모델을 동적으로 임포트하여 순환 참조 문제 방지
-  //   const User = require('./User.js').default; // .default를 사용하여 ES6 모듈 export 가져오기
+  static get relationMappings() {
+    // User 모델을 동적으로 임포트하여 순환 참조 문제 방지
+    // const User = require('./User.js').default; // .default를 사용하여 ES6 모듈 export 가져오기
 
-  //   return {
-  //     owner: {
-  //       relation: Model.BelongsToOneRelation,
-  //       modelClass: User,
-  //       join: {
-  //         from: 'items.user_id',
-  //         to: 'users.id'
-  //       }
-  //     }
-  //   };
-  // }
+    return {
+      // owner: { // 기존 User 관계 (주석 처리됨)
+      //   relation: Model.BelongsToOneRelation,
+      //   modelClass: User,
+      //   join: {
+      //     from: 'items.user_id',
+      //     to: 'users.id'
+      //   }
+      // },
+      itemStores: { // ItemStore와의 관계 추가
+        relation: Model.HasManyRelation,
+        modelClass: ItemStore,
+        join: {
+          from: 'items.id',
+          to: 'item_stores.item_id'
+        }
+      }
+    };
+  }
 
   // (선택 사항) 타임스탬프 자동 관리
   // $beforeInsert 및 $beforeUpdate 훅을 사용하여 created_at, updated_at 자동 설정

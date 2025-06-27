@@ -91,3 +91,17 @@ export const deleteItemById = async (req, res) => {
     res.status(500).json({ message: 'Failed to delete item.', error: error.message });
   }
 };
+
+// GET /items-with-store - 모든 아이템과 상점 정보 함께 조회
+export const getAllItemsWithStoreInfo = async (req, res) => {
+  try {
+    const itemsWithStores = await itemService.findAllItemsWithStoreDetails();
+    res.status(200).json(itemsWithStores);
+  } catch (error) {
+    console.error('Error fetching items with store info controller:', error.message);
+    if (error instanceof ServiceError) {
+      return res.status(error.statusCode || 500).json({ message: error.message, errorCode: error.errorCode });
+    }
+    res.status(500).json({ message: 'Failed to fetch items with store info.', error: error.message });
+  }
+};

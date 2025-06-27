@@ -131,6 +131,21 @@ class ItemRepository {
       throw error;
     }
   }
+
+  /**
+   * 모든 아이템을 상점 정보와 함께 조회합니다.
+   * @returns {Promise<Array<object>>} 아이템 객체의 배열 (각 아이템은 itemStores 정보를 포함)
+   * @throws {Error} 데이터베이스 오류 발생 시
+   */
+  async findItemsWithStoreInfo() {
+    try {
+      const items = await Item.query().withGraphFetched('itemStores').orderBy('created_at', 'desc');
+      return items;
+    } catch (error) {
+      console.error('Error in ItemRepository.findItemsWithStoreInfo:', error);
+      throw error;
+    }
+  }
 }
 
 export default ItemRepository;
