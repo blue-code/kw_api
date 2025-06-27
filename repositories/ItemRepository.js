@@ -1,6 +1,7 @@
 
 import Item from '../models/Item.js'; // Objection.js Item 모델 임포트
-import {NotFoundError} from 'objection';
+import { NotFoundError } from 'objection';
+import knex from '../config/knex.js'; // Knex 인스턴스 임포트
 
 
 
@@ -128,6 +129,76 @@ class ItemRepository {
       if (error instanceof NotFoundError) {
         return false; // 아이템을 찾지 못해 삭제하지 못한 경우
       }
+      throw error;
+    }
+  }
+
+  /**
+   * 모든 아이템을 상점 정보와 함께 조회합니다.
+   * @returns {Promise<Array<object>>} 아이템 객체의 배열 (각 아이템은 itemStores 정보를 포함)
+   * @throws {Error} 데이터베이스 오류 발생 시
+   */
+  async findItemsWithStoreInfo() {
+    try {
+      const items = await Item.query().withGraphFetched('itemStores').orderBy('created_at', 'desc');
+      return items;
+    } catch (error) {
+      console.error('Error in ItemRepository.findItemsWithStoreInfo:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 커스텀 SQL을 사용하여 모든 아이템을 상점 정보와 함께 조회합니다.
+   * @returns {Promise<Array<object>>} 아이템 객체의 배열 (각 아이템은 itemStores 정보를 포함)
+   * @throws {Error} 데이터베이스 오류 발생 시
+   */
+  async findItemsWithStoreInfoCustomSQL() {
+    try {
+      const sql = `
+        SELECT
+          i.id AS item_id,
+          i.name AS item_name,
+          i.description AS item_description,
+          i.user_id AS item_user_id,
+          i.created_at AS item_created_at,
+          i.updated_at AS item_updated_at,
+          COALESCE(
+            (
+              SELECT JSON_ARRAYAGG(
+                JSON_OBJECT(
+                  'id', ist.id,
+                  'store_name', ist.store_name,
+                  'price', ist.price,
+                  'stock', ist.stock,
+                  'created_at', ist.created_at,
+                  'updated_at', ist.updated_at
+                )
+              )
+              FROM item_stores ist
+              WHERE ist.item_id = i.id
+            ),
+            JSON_ARRAY()
+          ) AS itemStores
+        FROM items i
+        ORDER BY i.created_at DESC;
+      `;
+      const result = await knex.raw(sql);
+      // MySQL/MariaDB의 경우 결과는 result[0]에 배열로 들어 있습니다.
+      // PostgreSQL의 경우 result.rows에 배열로 들어 있습니다.
+      // Knex 설정 및 DB 드라이버에 따라 다를 수 있으므로 확인이 필요합니다.
+      // 일반적인 MySQL/MariaDB 환경을 가정합니다.
+      return result[0].map(item => ({
+        id: item.item_id,
+        name: item.item_name,
+        description: item.item_description,
+        user_id: item.item_user_id,
+        created_at: item.item_created_at,
+        updated_at: item.item_updated_at,
+        itemStores: typeof item.itemStores === 'string' ? JSON.parse(item.itemStores) : item.itemStores
+      }));
+    } catch (error) {
+      console.error('Error in ItemRepository.findItemsWithStoreInfoCustomSQL:', error);
       throw error;
     }
   }
