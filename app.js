@@ -3,15 +3,20 @@ import https from 'https';
 import fs from 'fs';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { testConnection } from './config/db.js'; // DB 연결 테스트 함수 임포트
+import { Model } from 'objection'; // Objection.Model 임포트
+import knexInstance from './config/knex.js'; // Knex 인스턴스 임포트
+// import { testConnection } from './config/db.js'; // 더 이상 사용하지 않음
 
 dotenv.config();
+
+// Objection.js 모델에 Knex 인스턴스 바인딩
+Model.knex(knexInstance);
 
 const app = express();
 const port = process.env.PORT || 3001; // HTTPS 기본 포트는 443이지만, 개발 편의상 다른 포트 사용
 
-// DB 연결 테스트 실행
-testConnection();
+// DB 연결 테스트 실행 (필요하다면 Knex를 사용한 새로운 연결 테스트 함수로 대체)
+// testConnection();
 
 // CORS 설정
 app.use(cors()); // 모든 도메인에서의 요청을 허용 (개발 중에는 편리하나, 프로덕션에서는 특정 도메인만 허용하도록 수정 필요)

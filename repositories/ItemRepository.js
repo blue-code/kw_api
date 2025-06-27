@@ -1,23 +1,30 @@
-import pool from '../config/db.js';
+
+import Item from '../models/Item.js'; // Objection.js Item 모델 임포트
+import {NotFoundError} from 'objection';
+
+
 
 class ItemRepository {
   /**
    * 새 아이템을 생성합니다.
    * @param {object} itemData - 생성할 아이템의 데이터. { name, description, userId }
    * @returns {Promise<object>} 생성된 아이템 객체
-   * @throws {Error} 데이터베이스 오류 발생 시
+   * @throws {Error} 데이터베이스 오류 또는 유효성 검사 오류 발생 시
    */
-  async create({ name, description, userId }) {
+  async create({ name, description, user_id }) { // user_id로 파라미터명 변경 (모델 스키마와 일치)
     try {
-      const [result] = await pool.query(
-        'INSERT INTO items (name, description, user_id) VALUES (?, ?, ?)',
-        [name, description, userId]
-      );
-      const newItemId = result.insertId;
-      return this.findById(newItemId);
+      // Item 모델의 $beforeInsert 훅에서 created_at, updated_at 자동 관리
+      const newItem = await Item.query().insert({
+        name,
+        description,
+        user_id
+      });
+      return newItem;
     } catch (error) {
       console.error('Error in ItemRepository.create:', error);
-      throw error; // 에러를 다시 throw하여 서비스 계층에서 처리하도록 함
+      // Objection.js의 ValidationError 등 특정 에러를 그대로 throw 하거나 커스텀 에러로 변환 가능
+      throw error;
+
     }
   }
 
@@ -28,8 +35,8 @@ class ItemRepository {
    */
   async findAll() {
     try {
-      const [rows] = await pool.query('SELECT id, name, description, user_id, created_at, updated_at FROM items ORDER BY created_at DESC');
-      return rows;
+      const items = await Item.query().orderBy('created_at', 'desc');
+      return items;
     } catch (error) {
       console.error('Error in ItemRepository.findAll:', error);
       throw error;
@@ -61,8 +68,9 @@ class ItemRepository {
    */
   async findByUserIdAndItemId(userId, itemId) {
     try {
-      const [rows] = await pool.query('SELECT id, name, description, user_id, created_at, updated_at FROM items WHERE id = ? AND user_id = ?', [itemId, userId]);
-      return rows.length > 0 ? rows[0] : null;
+      const item = await Item.query()
+        .findOne({ id: itemId, user_id: userId });
+      return item || null; // findOne은 못찾으면 undefined 반환하므로 null로 통일
     } catch (error) {
       console.error('Error in ItemRepository.findByUserIdAndItemId:', error);
       throw error;
@@ -73,37 +81,33 @@ class ItemRepository {
    * ID로 특정 아이템을 수정합니다.
    * @param {number} id - 수정할 아이템의 ID
    * @param {object} itemData - 수정할 아이템의 데이터. { name, description }
-   * @returns {Promise<object|null>} 수정된 아이템 객체 또는 아이템을 찾지 못했거나 변경 사항이 없는 경우 null (findById로 다시 조회하므로, 찾지 못하면 findById가 null 반환)
-   * @throws {Error} 데이터베이스 오류 발생 시
+   * @returns {Promise<object|null>} 수정된 아이템 객체. 아이템을 찾지 못하면 null.
+   * @throws {Error} 데이터베이스 오류 또는 유효성 검사 오류 발생 시
    */
   async update(id, { name, description }) {
-    let query = 'UPDATE items SET ';
-    const queryParams = [];
+    const updatePayload = {};
     if (name !== undefined) {
-      query += 'name = ?, ';
-      queryParams.push(name);
+      updatePayload.name = name;
     }
     if (description !== undefined) {
-      query += 'description = ?, ';
-      queryParams.push(description);
+      updatePayload.description = description;
     }
 
-    if (queryParams.length === 0) {
-      // 업데이트할 내용이 없으면 기존 아이템을 반환하거나, 특정 로직 처리
-      return this.findById(id);
+    if (Object.keys(updatePayload).length === 0) {
+      return this.findById(id); // 변경할 내용 없으면 현재 아이템 반환
     }
 
-    query += 'updated_at = CURRENT_TIMESTAMP WHERE id = ?';
-    queryParams.push(id);
-
+    // Item 모델의 $beforeUpdate 훅에서 updated_at 자동 관리
     try {
-      const [result] = await pool.query(query, queryParams);
-      if (result.affectedRows === 0) {
-        return null; // 업데이트된 행이 없음 (아이템이 없거나, ID가 잘못됨)
-      }
-      return this.findById(id); // 변경된 아이템 정보 다시 조회하여 반환
+      // patchAndFetchById는 업데이트 후 해당 아이템 객체를 반환합니다.
+      // 아이템이 없으면 NotFoundError를 발생시킵니다.
+      const updatedItem = await Item.query().patchAndFetchById(id, updatePayload);
+      return updatedItem;
     } catch (error) {
       console.error('Error in ItemRepository.update:', error);
+      if (error instanceof NotFoundError) {
+        return null; // 아이템을 찾지 못한 경우 null 반환 (서비스 계층 호환성)
+      }
       throw error;
     }
   }
@@ -116,10 +120,14 @@ class ItemRepository {
    */
   async delete(id) {
     try {
-      const [result] = await pool.query('DELETE FROM items WHERE id = ?', [id]);
-      return result.affectedRows > 0;
+      const numDeleted = await Item.query().deleteById(id);
+      return numDeleted > 0;
     } catch (error) {
+      // NotFoundError가 발생할 수 있음 (삭제할 아이템이 없는 경우)
       console.error('Error in ItemRepository.delete:', error);
+      if (error instanceof NotFoundError) {
+        return false; // 아이템을 찾지 못해 삭제하지 못한 경우
+      }
       throw error;
     }
   }
