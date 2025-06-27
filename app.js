@@ -3,11 +3,15 @@ import https from 'https';
 import fs from 'fs';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { testConnection } from './config/db.js'; // DB 연결 테스트 함수 임포트
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3001; // HTTPS 기본 포트는 443이지만, 개발 편의상 다른 포트 사용
+
+// DB 연결 테스트 실행
+testConnection();
 
 // CORS 설정
 app.use(cors()); // 모든 도메인에서의 요청을 허용 (개발 중에는 편리하나, 프로덕션에서는 특정 도메인만 허용하도록 수정 필요)
@@ -17,6 +21,7 @@ app.use(express.json());
 
 import authRoutes from './routes/authRoutes.js';
 import testRoutes from './routes/testRoutes.js';
+import itemRoutes from './routes/itemRoutes.js'; // 아이템 라우터 추가
 
 // 간단한 루트 응답
 app.get('/', (req, res) => {
@@ -26,6 +31,7 @@ app.get('/', (req, res) => {
 // 라우터 등록
 app.use('/auth', authRoutes);
 app.use('/test', testRoutes);
+app.use('/items', itemRoutes); // 아이템 라우터 등록
 
 // 404 핸들러
 app.use((req, res, next) => {
