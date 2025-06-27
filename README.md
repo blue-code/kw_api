@@ -26,6 +26,7 @@
 ### 사전 준비 사항
 
 -   Node.js (v14 이상 권장)
+-   HTTPS 통신을 위한 자체 서명 인증서 (`key.pem`, `cert.pem`)
 -   npm 또는 yarn
 
 ### 설치
