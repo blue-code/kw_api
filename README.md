@@ -135,7 +135,68 @@
 | `POST` | `/items`              | 새 아이템 생성           |     ✅     |
 | `PUT`  | `/items/:id`          | 아이템 정보 수정         |     ✅     |
 | `DELETE`| `/items/:id`         | 아이템 삭제              |     ✅     |
+| `POST` | `/files/upload`       | 파일 업로드              |     ✅     |
+| `GET`  | `/files/view/:filename`| 이미지 파일 미리보기      |     ❌     |
+| `GET`  | `/files/download/:filename`| 파일 다운로드          |     ✅     |
 | `GET`  | `/test`               | 보호된 테스트 라우트     |     ✅     |
+
+### 파일 API 상세
+
+#### 1. 파일 업로드
+
+-   **Method**: `POST`
+-   **Path**: `/files/upload`
+-   **인증**: 필요 (Bearer Token)
+-   **Request Body**: `multipart/form-data`
+    -   `file`: 업로드할 파일 (필수)
+-   **Response (Success 200)**:
+    ```json
+    {
+        "resultCode": 0,
+        "resultMessage": "File uploaded successfully.",
+        "data": {
+            "id": 1,
+            "filename": "file-1629878392-random.jpg",
+            "originalname": "original.jpg",
+            "mimetype": "image/jpeg",
+            "size": 102400, // bytes
+            "path": "uploads/file-1629878392-random.jpg",
+            "createdAt": "2023-01-01T12:00:00.000Z",
+            "updatedAt": "2023-01-01T12:00:00.000Z"
+        }
+    }
+    ```
+-   **Response (Error)**:
+    -   `400 Bad Request` (`FileNotFound`): 파일이 첨부되지 않은 경우
+    -   `401 Unauthorized`: 인증 실패
+    -   `500 Internal Server Error`: 서버 내부 오류
+
+#### 2. 이미지 파일 미리보기
+
+-   **Method**: `GET`
+-   **Path**: `/files/view/:filename`
+    -   `:filename`: 업로드 시 반환된 `filename`
+-   **인증**: 불필요 (설정에 따라 변경 가능)
+-   **Response (Success 200)**:
+    -   `Content-Type`: 이미지의 mimetype (예: `image/jpeg`)
+    -   Body: 이미지 데이터
+-   **Response (Error)**:
+    -   `404 Not Found` (`FileNotFound`): 해당 파일이 없거나, DB에 정보가 없는 경우
+    -   `400 Bad Request` (`NotAnImage`): 요청한 파일이 이미지가 아닌 경우 (현재 로직)
+
+#### 3. 파일 다운로드
+
+-   **Method**: `GET`
+-   **Path**: `/files/download/:filename`
+    -   `:filename`: 업로드 시 반환된 `filename`
+-   **인증**: 필요 (Bearer Token)
+-   **Response (Success 200)**:
+    -   `Content-Disposition`: `attachment; filename="<originalname>"`
+    -   Body: 파일 데이터
+-   **Response (Error)**:
+    -   `401 Unauthorized`: 인증 실패
+    -   `404 Not Found` (`FileNotFound`): 해당 파일이 없거나, DB에 정보가 없는 경우
+    -   `500 Internal Server Error`: 서버 내부 오류
 
 ## scripts
 

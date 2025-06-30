@@ -25,6 +25,7 @@ app.use(express.json());
 import authRoutes from './routes/authRoutes.js';
 import testRoutes from './routes/testRoutes.js';
 import itemRoutes from './routes/itemRoutes.js'; // 아이템 라우터 추가
+import fileRoutes from './routes/fileRoutes.js'; // 파일 라우터 추가
 
 // 간단한 루트 응답
 app.get('/', (req, res) => {
@@ -35,6 +36,7 @@ app.get('/', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/test', testRoutes);
 app.use('/items', itemRoutes); // 아이템 라우터 등록
+app.use('/files', fileRoutes); // 파일 라우터 등록
 
 import errorHandler from './middleware/errorHandler.js';
 

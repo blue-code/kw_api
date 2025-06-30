@@ -1,4 +1,4 @@
-import { ServiceError } from '../services/itemService.js';
+import { AppError } from '../utils/AppError.js'; // 변경
 import { errorResponse } from '../utils/responseHandler.js';
 import logger from '../config/logger.js';
 import { ERROR_CODES } from '../config/errorCodes.js';
@@ -6,7 +6,7 @@ import { ERROR_CODES } from '../config/errorCodes.js';
 const errorHandler = (err, req, res, next) => {
   logger.error('Error caught by errorHandler:', err.stack);
 
-  if (err instanceof ServiceError) {
+  if (err instanceof AppError) { // 변경
     return res.status(err.statusCode).json(errorResponse(err.errorCode, err.message));
   }
 
