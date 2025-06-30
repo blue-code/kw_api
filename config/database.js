@@ -11,7 +11,7 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     port: process.env.DB_PORT || 3306,
     dialect: 'mysql',
-    logging: false, // 프로덕션에서는 false로 설정
+    logging: console.log, // 모든 SQL 쿼리를 콘솔에 로깅
   }
 );
 
