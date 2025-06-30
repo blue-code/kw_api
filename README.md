@@ -1,61 +1,117 @@
+# KW API: JWT 인증을 사용한 Node.js Express API
 
-# kw_api
 <div align="center">
-  <h1>KW API: JWT 인증을 사용한 간단한 Node.js Express API</h1>
+  <p>Node.js, Express, MySQL 기반의 RESTful API 서버입니다. JSON Web Token (JWT)을 사용한 인증, Objection.js 및 Knex.js를 통한 데이터베이스 관리 기능을 제공합니다.</p>
 </div>
 
-이 프로젝트는 Node.js, Express 및 MySQL을 사용하여 구축된 간단한 RESTful API 서버입니다. JSON Web Token (JWT)을 사용하여 사용자 인증 및 권한 부여를 처리합니다. 이 API는 사용자 인증, 아이템 관리 및 테스트 엔드포인트를 제공하며, JWT 기반의 보안을 통해 보호됩니다.
-## 기능
+## ✨ 주요 기능
 
--   사용자 로그인 및 JWT 발급 (`POST /api/auth/login`)
--   JWT 유효성 검증 (`POST /auth/validate`)
--   JWT로 보호되는 경로 (예: `GET /test`)
--   HTTPS 지원 (개발용 자체 서명 인증서 사용)
--   환경 변수를 사용한 JWT 설정 (시크릿, 만료 시간)
--   Insomnia 요청 컬렉션 제공 (`/scripts/Insomnia.json`)
-## 시작하기
+-   **사용자 인증**: JWT 토큰 기반의 로그인 및 인증 상태 검증 (`/api/auth/login`, `/api/auth/validate`)
+-   **아이템 관리**: CRUD 기능을 갖춘 아이템 관리 API
+-   **보안**: JWT 미들웨어를 통해 보호되는 API 라우트
+-   **데이터베이스 관리**: Knex.js를 사용한 데이터베이스 마이그레이션 및 쿼리 빌딩
+-   **객체 관계 매핑(ORM)**: Objection.js를 사용하여 JavaScript 객체와 데이터베이스 레코드를 매핑
+-   **HTTPS 지원**: 개발 환경을 위한 자체 서명 인증서 사용
 
-이 지침은 프로젝트를 로컬 개발 환경에 설정하고 실행하는 방법을 안내합니다.
+## 🛠️ 기술 스택
 
-### 필수 조건
+-   **백엔드**: Node.js, Express.js
+-   **데이터베이스**: MySQL
+-   **ORM & 쿼리 빌더**: Objection.js, Knex.js
+-   **인증**: JSON Web Token (JWT), bcrypt
+-   **기타**: dotenv, cors
 
+## 🚀 시작하기
 
-프로젝트를 로컬 개발 환경에 설정하고 실행하기 위한 지침입니다.
+### 📋 필수 조건
 
-### 사전 준비 사항
-*   MySQL 데이터베이스
--   Node.js (v14 이상 권장)
--   HTTPS 통신을 위한 자체 서명 인증서 (`key.pem`, `cert.pem`)
--   npm 또는 yarn 패키지 매니저
+-   [Node.js](https://nodejs.org/) (v14 이상 권장)
+-   [MySQL](https://www.mysql.com/)
+-   `git`
 
-## 프로젝트 구조
-프로젝트는 모듈성과 유지보수성을 염두에 두고 체계적인 디렉토리 구조를 따릅니다. 주요 디렉토리 및 파일의 역할은 다음과 같습니다.
+### ⚙️ 설치 및 설정
 
+1.  **저장소 클론**
+    ```bash
+    git clone https://github.com/blue-code/kw_api.git
+    cd kw_api
+    ```
 
+2.  **NPM 패키지 설치**
+    ```bash
+    npm install
+    ```
 
-## ORM (Object-Relational Mapping)
-## ORM (Object-Relational Mapping)
+3.  **데이터베이스 설정**
+    -   MySQL에 접속하여 `scripts/init_db.sql` 파일의 내용을 실행하여 데이터베이스와 테이블을 생성합니다.
+    -   또는, 다음 명령어를 사용하여 직접 데이터베이스를 생성할 수 있습니다.
+        ```sql
+        CREATE DATABASE kw_api_db;
+        ```
 
-이 프로젝트는 데이터베이스 상호 작용을 위해 순수 SQL 쿼리 대신 **Objection.js** ORM과 **Knex.js** 쿼리 빌더를 사용합니다. 데이터베이스 드라이버로는 **mysql2**가 사용됩니다.
+4.  **환경 변수 설정**
+    -   `.env.example` 파일을 복사하여 `.env` 파일을 생성합니다.
+        ```bash
+        cp .env.example .env
+        ```
+    -   생성된 `.env` 파일을 열어 본인의 환경에 맞게 값을 수정합니다. (DB 정보, JWT 시크릿 등)
 
-### Objection.js 및 Knex.js 선택 이유
+5.  **SSL 인증서 생성 (개발용)**
+    -   HTTPS 서버를 로컬에서 실행하기 위해 자체 서명 인증서가 필요합니다. `openssl`을 사용하여 생성할 수 있습니다.
+        ```bash
+        openssl genrsa -out key.pem 2048
+        openssl req -new -key key.pem -out csr.pem
+        openssl x509 -req -days 365 -in csr.pem -signkey key.pem -out cert.pem
+        ```
+    -   생성된 `key.pem`과 `cert.pem` 파일은 프로젝트 루트 디렉토리에 위치해야 합니다.
 
-Objection.js와 Knex.js를 선택한 주요 이유는 다음과 같습니다.
--   **생산성 향상:** 객체 지향적인 방식으로 데이터베이스 작업을 처리하여 반복적인 SQL 작성 작업을 줄여줍니다.
--   **유지보수성:** 코드 가독성을 높이고 데이터베이스 스키마 변경에 유연하게 대처할 수 있습니다.
--   **데이터베이스 추상화:** 여러 데이터베이스 시스템을 지원하여 데이터베이스 변경 시 코드 수정이 최소화됩니다.
--   **마이그레이션 지원:** 데이터베이스 스키마 변경 이력을 관리하고 적용하는 데 용이합니다.
--   **Knex.js의 강력한 쿼리 빌더:** 복잡한 쿼리를 작성하기 용이하며, Objection.js와 자연스럽게 통합됩니다.
--   **유연성:** Objection.js는 데이터베이스 스키마에 덜 종속적이며, 기존 데이터베이스와의 통합이 비교적 쉽습니다.
--   **간결하고 표현적인 모델 정의:** JavaScript 클래스를 사용하여 데이터베이스 모델을 정의하는 방식이 직관적입니다.
--
-### 구성
+### ▶️ 실행
 
-sequelize는 `config/db.js` 파일에서 구성됩니다. 이 파일은 데이터베이스 연결 설정을 정의하고 sequelize 인스턴스를 생성하여 내보냅니다. 연결 정보는 환경 변수 또는 직접 설정으로 지정할 수 있습니다.
+-   **서버 시작**
+    ```bash
+    npm start
+    ```
+-   서버가 정상적으로 실행되면 콘솔에 `HTTPS 서버가 https://localhost:3001 에서 실행 중입니다.` 메시지가 출력됩니다.
 
+## 📁 프로젝트 구조
 
-### 설치
+```
+.
+├── config/             # 데이터베이스(Knex) 등 설정 파일
+├── controllers/        # 요청 처리 및 응답 반환 로직
+├── middleware/         # Express 미들웨어 (예: JWT 인증)
+├── models/             # Objection.js 데이터베이스 모델
+├── repositories/       # 데이터베이스 접근 로직 (CRUD)
+├── routes/             # API 라우팅 정의
+├── services/           # 비즈니스 로직
+├── scripts/            # DB 초기화 스크립트, Insomnia 컬렉션 등
+├── .env.example        # 환경 변수 예시 파일
+├── app.js              # Express 애플리케이션 진입점
+└── package.json        # 프로젝트 의존성 및 스크립트 정의
+```
 
-1.  저장소를 클론합니다:
+## 🌐 API 엔드포인트
 
+| Method | Path                  | 설명                     | 인증 필요 |
+| :----- | :-------------------- | :----------------------- | :-------: |
+| `POST` | `/auth/login`         | 사용자 로그인 및 JWT 발급 |     ❌     |
+| `POST` | `/auth/validate`      | JWT 토큰 유효성 검증     |     ✅     |
+| `GET`  | `/items`              | 모든 아이템 조회         |     ✅     |
+| `GET`  | `/items/:id`          | 특정 아이템 조회         |     ✅     |
+| `POST` | `/items`              | 새 아이템 생성           |     ✅     |
+| `PUT`  | `/items/:id`          | 아이템 정보 수정         |     ✅     |
+| `DELETE`| `/items/:id`         | 아이템 삭제              |     ✅     |
+| `GET`  | `/test`               | 보호된 테스트 라우트     |     ✅     |
 
+## scripts
+
+-   `npm start`: Node.js 서버를 실행합니다.
+-   `npm test`: (현재 설정되지 않음) 테스트를 실행합니다.
+
+## 🤝 기여하기
+
+프로젝트에 기여하고 싶으시다면, 이슈를 생성하거나 풀 리퀘스트를 보내주세요.
+
+## 📄 라이선스
+
+본 프로젝트는 ISC 라이선스를 따릅니다.
