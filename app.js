@@ -37,17 +37,15 @@ app.use('/auth', authRoutes);
 app.use('/test', testRoutes);
 app.use('/items', itemRoutes); // 아이템 라우터 등록
 
+import errorHandler from './middleware/errorHandler.js';
+
 // 404 핸들러
 app.use((req, res, next) => {
   res.status(404).json({ message: 'Not Found' });
 });
 
-// 기본 오류 처리 미들웨어
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!', error: err.message });
-});
+// 중앙 오류 처리 미들웨어
+app.use(errorHandler);
 
 // HTTPS 서버 설정 (개발용 자체 서명 인증서 필요)
 // TODO: 실제 운영 환경에서는 정식 SSL 인증서를 사용해야 합니다.
