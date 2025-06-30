@@ -3,14 +3,13 @@ import https from 'https';
 import fs from 'fs';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { Model } from 'objection'; // Objection.Model 임포트
-import knexInstance from './config/knex.js'; // Knex 인스턴스 임포트
+import sequelize, { testConnection } from './config/database.js';
 // import { testConnection } from './config/db.js'; // 더 이상 사용하지 않음
 
 dotenv.config();
 
-// Objection.js 모델에 Knex 인스턴스 바인딩
-Model.knex(knexInstance);
+// 데이터베이스 연결 테스트
+testConnection();
 
 const app = express();
 const port = process.env.PORT || 3001; // HTTPS 기본 포트는 443이지만, 개발 편의상 다른 포트 사용

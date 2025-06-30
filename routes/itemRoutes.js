@@ -8,7 +8,7 @@ import {
 
   getAllItemsWithStoreInfo,
   getAllItemsWithStoreInfoCustomSQL, // 새로 추가된 컨트롤러 함수 임포트
-  getAllItemsWithStoreInfo, // 추가된 컨트롤러 함수 임포트
+  
 
 } from '../controllers/itemController.js';
 import { verifyToken } from '../middleware/authMiddleware.js';

@@ -13,7 +13,7 @@ export class ServiceError extends Error {
 
 // ItemRepository 인스턴스 생성 (간단한 DI 형태)
 // 실제 애플리케이션에서는 DI 컨테이너를 사용하거나 app.js 등에서 주입할 수 있습니다.
-const itemRepository = new ItemRepository();
+const itemRepository = ItemRepository;
 
 export const createNewItem = async (name, description, userId) => {
   // 컨트롤러에서 이미 name 유효성 검사를 수행한다고 가정합니다.
@@ -35,9 +35,7 @@ export const createNewItem = async (name, description, userId) => {
     console.error('Service Error creating item:', error.message);
     // Objection.js의 ValidationError 등을 고려하여 처리할 수 있습니다.
     // 예: if (error.name === 'ValidationError') { throw new ServiceError(error.message, 400, 'VALIDATION_ERROR'); }
-    if (error instanceof require('objection').ValidationError) {
-        throw new ServiceError(`Validation failed: ${error.message}`, 400, 'VALIDATION_ERROR_OBJECTION');
-    }
+    
     throw new ServiceError(error.message || 'Failed to create item in database.', 500, 'DB_ERROR_CREATE');
   }
 };
@@ -105,9 +103,7 @@ export const updateExistingItem = async (itemId, currentUserId, updateData) => {
   } catch (error) {
     if (error instanceof ServiceError) throw error;
     // Objection.js의 ValidationError 등을 고려
-    if (error instanceof require('objection').ValidationError) {
-        throw new ServiceError(`Validation failed during update: ${error.message}`, 400, 'VALIDATION_ERROR_OBJECTION_UPDATE');
-    }
+    
 
     console.error('Service Error updating item:', error.message);
     throw new ServiceError(error.message || 'Failed to update item in database.', 500, 'DB_ERROR_UPDATE');

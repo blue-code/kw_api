@@ -9,15 +9,14 @@
 -   **사용자 인증**: JWT 토큰 기반의 로그인 및 인증 상태 검증 (`/api/auth/login`, `/api/auth/validate`)
 -   **아이템 관리**: CRUD 기능을 갖춘 아이템 관리 API
 -   **보안**: JWT 미들웨어를 통해 보호되는 API 라우트
--   **데이터베이스 관리**: Knex.js를 사용한 데이터베이스 마이그레이션 및 쿼리 빌딩
--   **객체 관계 매핑(ORM)**: Objection.js를 사용하여 JavaScript 객체와 데이터베이스 레코드를 매핑
+-   **객체 관계 매핑(ORM)**: Sequelize를 사용하여 JavaScript 객체와 데이터베이스 레코드를 매핑
 -   **HTTPS 지원**: 개발 환경을 위한 자체 서명 인증서 사용
 
 ## 🛠️ 기술 스택
 
 -   **백엔드**: Node.js, Express.js
 -   **데이터베이스**: MySQL
--   **ORM & 쿼리 빌더**: Objection.js, Knex.js
+-   **ORM**: Sequelize
 -   **인증**: JSON Web Token (JWT), bcrypt
 -   **기타**: dotenv, cors
 
