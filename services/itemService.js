@@ -1,13 +1,14 @@
 import ItemRepository from '../repositories/ItemRepository.js';
 import logger from '../config/logger.js';
 
-// 커스텀 에러 클래스 (선택적이지만, 오류 유형을 구분하는 데 유용)
-// 이 클래스는 변경 없이 그대로 사용합니다.
+import { HTTP_STATUS_ERROR_MAP, ERROR_CODES } from '../config/errorCodes.js';
+
 export class ServiceError extends Error {
-  constructor(message, statusCode, errorCode) {
+  constructor(message, statusCode = 500, errorCode) {
     super(message);
-    this.statusCode = statusCode; // HTTP 상태 코드 제안
-    this.errorCode = errorCode;   // 내부 에러 코드 (예: ITEM_NOT_FOUND)
+    this.statusCode = statusCode;
+    this.errorCode = errorCode || HTTP_STATUS_ERROR_MAP[statusCode] || 1000; // 기본값 Internal Server Error
+    this.message = message || ERROR_CODES[this.errorCode] || 'An unexpected error occurred.';
     this.name = this.constructor.name;
   }
 }

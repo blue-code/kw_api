@@ -1,3 +1,5 @@
+import { successResponse } from '../utils/responseHandler.js';
+
 /**
  * 보호된 테스트 데이터 가져오기
  * GET /test
@@ -5,9 +7,8 @@
  */
 export const getTestData = (req, res) => {
   // verifyToken 미들웨어에서 req.user에 저장된 사용자 정보를 사용할 수 있습니다.
-  res.status(200).json({
-    message: 'This is protected test data.',
+  res.status(200).json(successResponse({
     user: req.user, // 토큰에서 추출된 사용자 정보
     timestamp: new Date().toISOString(),
-  });
+  }, 'This is protected test data.'));
 };

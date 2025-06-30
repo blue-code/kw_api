@@ -1,6 +1,7 @@
 
 import * as authService from '../services/authService.js';
-import { ServiceError } from '../services/itemService.js'; // authService에서도 동일한 ServiceError 사용 가능 (또는 authService에 별도 정의)
+import { successResponse, errorResponse } from '../utils/responseHandler.js';
+import { ERROR_CODES } from '../config/errorCodes.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
@@ -26,19 +27,19 @@ export const login = (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.status(400).json({ message: 'Username and password are required.' });
+    return res.status(400).json(errorResponse(1001, 'Username and password are required.'));
   }
 
   // 임시 사용자 데이터에서 사용자 찾기
   const user = users.find(u => u.username === username);
 
   if (!user) {
-    return res.status(401).json({ message: 'Invalid credentials.' });
+    return res.status(401).json(errorResponse(2001, 'Invalid credentials.'));
   }
 
   // 비밀번호 비교 (실제 환경에서는 bcrypt.compareSync 사용)
   if (user.password !== password) {
-    return res.status(401).json({ message: 'Invalid credentials.' });
+    return res.status(401).json(errorResponse(2001, 'Invalid credentials.'));
   }
 
   // JWT 생성
@@ -46,11 +47,7 @@ export const login = (req, res) => {
     expiresIn: JWT_EXPIRES_IN,
   });
 
-  res.status(200).json({
-    message: 'Login successful',
-    token,
-    expiresIn: JWT_EXPIRES_IN,
-  });
+  res.status(200).json(successResponse({ token, expiresIn: JWT_EXPIRES_IN }, 'Login successful'));
 };
 
 /**
@@ -63,19 +60,13 @@ export const validateToken = (req, res) => {
   const { token } = req.body;
 
   if (!token) {
-    return res.status(400).json({ message: 'Token is required.' });
+    return res.status(400).json(errorResponse(1001, 'Token is required.'));
   }
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    res.status(200).json({
-      message: 'Token is valid.',
-      user: decoded,
-    });
+    res.status(200).json(successResponse({ user: decoded }, 'Token is valid.'));
   } catch (error) {
-    res.status(401).json({
-      message: 'Token is invalid or expired.',
-      error: error.message,
-    });
+    res.status(401).json(errorResponse(2003, 'Token is invalid or expired.', error.message));
   }
 };
