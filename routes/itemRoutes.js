@@ -7,8 +7,9 @@ import {
   deleteItemById,
 
   getAllItemsWithStoreInfo,
-  getAllItemsWithStoreInfoCustomSQL, // 새로 추가된 컨트롤러 함수 임포트
-  
+  getAllItemsWithStoreInfoCustomSQL,
+  getPaginatedItemsController,
+  getPaginatedItemsCustomSQLController,
 
 } from '../controllers/itemController.js';
 import { verifyToken } from '../middleware/authMiddleware.js';
@@ -28,6 +29,12 @@ router.get('/with-store', getAllItemsWithStoreInfo);
 // GET /items/with-store-custom-sql - 커스텀 SQL을 사용하여 모든 아이템 및 상점 정보 조회 (인증 불필요)
 router.get('/with-store-custom-sql', getAllItemsWithStoreInfoCustomSQL);
 
+
+// GET /items/paginated - 페이징된 아이템 조회 (ORM 사용)
+router.get('/paginated', getPaginatedItemsController);
+
+// GET /items/paginated-custom-sql - 페이징된 아이템 조회 (커스텀 SQL 사용)
+router.get('/paginated-custom-sql', getPaginatedItemsCustomSQLController);
 
 // GET /items/:id - 특정 아이템 조회 (인증 불필요)
 router.get('/:id', getItemById);

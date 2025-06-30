@@ -70,6 +70,53 @@ class ItemRepository {
     `);
     return results;
   }
+
+  async findPaginatedItems(page, limit) {
+    const offset = (page - 1) * limit;
+    console.log(`[ItemRepository] findPaginatedItems - page: ${page}, limit: ${limit}, offset: ${offset}`);
+    const { count, rows } = await Item.findAndCountAll({
+      limit: limit,
+      offset: offset,
+      include: ['stores'],
+      order: [['createdAt', 'DESC']],
+    });
+    console.log(`[ItemRepository] findPaginatedItems - Found ${rows.length} items, Total: ${count}`);
+    return { items: rows, totalItems: count, currentPage: page, totalPages: Math.ceil(count / limit) };
+  }
+
+  async findPaginatedItemsCustomSQL(page, limit) {
+    const offset = (page - 1) * limit;
+    console.log(`[ItemRepository] findPaginatedItemsCustomSQL - page: ${page}, limit: ${limit}, offset: ${offset}`);
+    const itemsQuery = `
+      SELECT
+          Item.id AS itemId,
+          Item.name AS itemName,
+          Item.description AS itemDescription,
+          Item.created_at AS itemCreatedAt,
+          Item.updated_at AS itemUpdatedAt,
+          ItemStore.id AS storeId,
+          ItemStore.store_name AS storeName,
+          ItemStore.price AS price,
+          ItemStore.stock AS stock,
+          ItemStore.created_at AS storeCreatedAt,
+          ItemStore.updated_at AS storeUpdatedAt
+      FROM
+          items AS Item
+      LEFT JOIN
+          item_stores AS ItemStore ON Item.id = ItemStore.item_id
+      ORDER BY
+          Item.created_at DESC
+      LIMIT ${limit} OFFSET ${offset};
+    `;
+    const countQuery = `SELECT COUNT(*) AS totalItems FROM items;`;
+
+    const [items] = await sequelize.query(itemsQuery);
+    const [countResult] = await sequelize.query(countQuery);
+    const totalItems = countResult[0].totalItems;
+    console.log(`[ItemRepository] findPaginatedItemsCustomSQL - Found ${items.length} items, Total: ${totalItems}`);
+
+    return { items, totalItems, currentPage: page, totalPages: Math.ceil(totalItems / limit) };
+  }
 }
 
 export default new ItemRepository();

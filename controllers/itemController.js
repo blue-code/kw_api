@@ -121,3 +121,35 @@ export const getAllItemsWithStoreInfoCustomSQL = async (req, res) => {
   }
 };
 
+export const getPaginatedItemsController = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+
+  try {
+    const result = await itemService.getPaginatedItems(page, limit);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error fetching paginated items controller:', error.message);
+    if (error instanceof ServiceError) {
+      return res.status(error.statusCode || 500).json({ message: error.message, errorCode: error.errorCode });
+    }
+    res.status(500).json({ message: 'Failed to fetch paginated items.', error: error.message });
+  }
+};
+
+export const getPaginatedItemsCustomSQLController = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+
+  try {
+    const result = await itemService.getPaginatedItemsCustomSQL(page, limit);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error fetching paginated items via custom SQL controller:', error.message);
+    if (error instanceof ServiceError) {
+      return res.status(error.statusCode || 500).json({ message: error.message, errorCode: error.errorCode });
+    }
+    res.status(500).json({ message: 'Failed to fetch paginated items using custom SQL.', error: error.message });
+  }
+};
+

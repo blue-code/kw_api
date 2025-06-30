@@ -158,3 +158,23 @@ export const findAllItemsWithStoreDetailsCustomSQL = async () => {
   }
 };
 
+export const getPaginatedItems = async (page, limit) => {
+  try {
+    const result = await itemRepository.findPaginatedItems(page, limit);
+    return result;
+  } catch (error) {
+    console.error('Service Error fetching paginated items:', error.message);
+    throw new ServiceError(error.message || 'Failed to fetch paginated items from database.', 500, 'DB_ERROR_PAGINATED_FETCH');
+  }
+};
+
+export const getPaginatedItemsCustomSQL = async (page, limit) => {
+  try {
+    const result = await itemRepository.findPaginatedItemsCustomSQL(page, limit);
+    return result;
+  } catch (error) {
+    console.error('Service Error fetching paginated items via custom SQL:', error.message);
+    throw new ServiceError(error.message || 'Failed to fetch paginated items from database using custom SQL.', 500, 'DB_ERROR_PAGINATED_FETCH_CUSTOM_SQL');
+  }
+};
+
