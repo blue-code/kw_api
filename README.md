@@ -18,7 +18,24 @@
 -   **데이터베이스**: MySQL
 -   **ORM**: Sequelize
 -   **인증**: JSON Web Token (JWT), bcrypt
+-   **로깅**: Winston
 -   **기타**: dotenv, cors
+
+## 📊 로깅
+
+이 애플리케이션은 [Winston](https://github.com/winstonjs/winston) 라이브러리를 사용하여 로그를 관리합니다. 로그는 콘솔과 파일에 동시에 기록됩니다.
+
+### 로그 파일 위치
+
+-   **애플리케이션 로그**: `logs/application-YYYY-MM-DD.log`
+-   **예외 로그**: `logs/exceptions-YYYY-MM-DD.log` (처리되지 않은 예외)
+-   **거부된 Promise 로그**: `logs/rejections-YYYY-MM-DD.log` (처리되지 않은 Promise 거부)
+
+로그 파일은 일별로 회전되며, 최대 크기(20MB) 및 보존 기간(14일)이 설정되어 있습니다.
+
+### 로깅 설정
+
+로깅 설정은 `config/logger.js` 파일에서 관리됩니다. 이곳에서 로그 레벨, 출력 형식, 파일 회전 정책 등을 조정할 수 있습니다.
 
 ## 🚀 시작하기
 

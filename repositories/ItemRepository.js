@@ -1,5 +1,6 @@
 import { Item, ItemStore } from '../models/Item.js';
 import sequelize from '../config/database.js';
+import logger from '../config/logger.js';
 
 class ItemRepository {
   async findAll() {
@@ -107,8 +108,8 @@ class ItemRepository {
     `;
     const countQuery = `SELECT COUNT(*) AS totalItems FROM items;`;
 
-    console.log('[ItemRepository] Custom SQL (itemsQuery):', itemsQuery);
-    console.log('[ItemRepository] Custom SQL (countQuery):', countQuery);
+    logger.info('[ItemRepository] Custom SQL (itemsQuery):', itemsQuery);
+    logger.info('[ItemRepository] Custom SQL (countQuery):', countQuery);
 
     const [items] = await sequelize.query(itemsQuery);
     const [countResult] = await sequelize.query(countQuery);

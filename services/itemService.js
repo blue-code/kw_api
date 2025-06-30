@@ -1,4 +1,5 @@
 import ItemRepository from '../repositories/ItemRepository.js';
+import logger from '../config/logger.js';
 
 // 커스텀 에러 클래스 (선택적이지만, 오류 유형을 구분하는 데 유용)
 // 이 클래스는 변경 없이 그대로 사용합니다.
@@ -32,7 +33,7 @@ export const createNewItem = async (name, description, userId) => {
     return newItem;
   } catch (error) {
     // Repository에서 발생한 일반 DB 오류 등을 ServiceError로 변환하거나 그대로 전달
-    console.error('Service Error creating item:', error.message);
+    logger.error('Service Error creating item:', error.message);
     // Objection.js의 ValidationError 등을 고려하여 처리할 수 있습니다.
     // 예: if (error.name === 'ValidationError') { throw new ServiceError(error.message, 400, 'VALIDATION_ERROR'); }
     
@@ -45,7 +46,7 @@ export const findAllItems = async () => {
     const items = await itemRepository.findAll();
     return items;
   } catch (error) {
-    console.error('Service Error fetching all items:', error.message);
+    logger.error('Service Error fetching all items:', error.message);
     throw new ServiceError(error.message || 'Failed to fetch items from database.', 500, 'DB_ERROR_FETCH_ALL');
   }
 };
@@ -61,7 +62,7 @@ export const findItemById = async (itemId) => {
     return item;
   } catch (error) {
     if (error instanceof ServiceError) throw error;
-    console.error('Service Error fetching item by ID:', error.message);
+    logger.error('Service Error fetching item by ID:', error.message);
     throw new ServiceError(error.message || 'Failed to fetch item by ID from database.', 500, 'DB_ERROR_FETCH_ONE');
   }
 };
@@ -105,7 +106,7 @@ export const updateExistingItem = async (itemId, currentUserId, updateData) => {
     // Objection.js의 ValidationError 등을 고려
     
 
-    console.error('Service Error updating item:', error.message);
+    logger.error('Service Error updating item:', error.message);
     throw new ServiceError(error.message || 'Failed to update item in database.', 500, 'DB_ERROR_UPDATE');
   }
 };
@@ -132,7 +133,7 @@ export const deleteExistingItem = async (itemId, currentUserId) => {
     return { message: 'Item deleted successfully.' };
   } catch (error) {
     if (error instanceof ServiceError) throw error;
-    console.error('Service Error deleting item:', error.message);
+    logger.error('Service Error deleting item:', error.message);
     throw new ServiceError(error.message || 'Failed to delete item from database.', 500, 'DB_ERROR_DELETE');
   }
 };
@@ -142,7 +143,7 @@ export const findAllItemsWithStoreDetails = async () => {
     const itemsWithStores = await itemRepository.findItemsWithStoreInfo();
     return itemsWithStores;
   } catch (error) {
-    console.error('Service Error fetching items with store details:', error.message);
+    logger.error('Service Error fetching items with store details:', error.message);
     throw new ServiceError(error.message || 'Failed to fetch items with store details from database.', 500, 'DB_ERROR_FETCH_ALL_WITH_STORES');
   }
 };
@@ -153,7 +154,7 @@ export const findAllItemsWithStoreDetailsCustomSQL = async () => {
     const itemsWithStores = await itemRepository.findItemsWithStoreInfoCustomSQL();
     return itemsWithStores;
   } catch (error) {
-    console.error('Service Error fetching items with store details via custom SQL:', error.message);
+    logger.error('Service Error fetching items with store details via custom SQL:', error.message);
     throw new ServiceError(error.message || 'Failed to fetch items with store details from database using custom SQL.', 500, 'DB_ERROR_FETCH_ALL_WITH_STORES_CUSTOM_SQL');
   }
 };
@@ -163,7 +164,7 @@ export const getPaginatedItems = async (page, limit) => {
     const result = await itemRepository.findPaginatedItems(page, limit);
     return result;
   } catch (error) {
-    console.error('Service Error fetching paginated items:', error.message);
+    logger.error('Service Error fetching paginated items:', error.message);
     throw new ServiceError(error.message || 'Failed to fetch paginated items from database.', 500, 'DB_ERROR_PAGINATED_FETCH');
   }
 };
@@ -173,7 +174,7 @@ export const getPaginatedItemsCustomSQL = async (page, limit) => {
     const result = await itemRepository.findPaginatedItemsCustomSQL(page, limit);
     return result;
   } catch (error) {
-    console.error('Service Error fetching paginated items via custom SQL:', error.message);
+    logger.error('Service Error fetching paginated items via custom SQL:', error.message);
     throw new ServiceError(error.message || 'Failed to fetch paginated items from database using custom SQL.', 500, 'DB_ERROR_PAGINATED_FETCH_CUSTOM_SQL');
   }
 };

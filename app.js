@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 import sequelize, { testConnection } from './config/database.js';
 // import { testConnection } from './config/db.js'; // 더 이상 사용하지 않음
 
+import logger from './config/logger.js';
+
 dotenv.config();
 
 // 데이터베이스 연결 테스트
@@ -13,9 +15,6 @@ testConnection();
 
 const app = express();
 const port = process.env.PORT || 3001; // HTTPS 기본 포트는 443이지만, 개발 편의상 다른 포트 사용
-
-// DB 연결 테스트 실행 (필요하다면 Knex를 사용한 새로운 연결 테스트 함수로 대체)
-// testConnection();
 
 // CORS 설정
 app.use(cors()); // 모든 도메인에서의 요청을 허용 (개발 중에는 편리하나, 프로덕션에서는 특정 도메인만 허용하도록 수정 필요)
@@ -57,16 +56,16 @@ try {
   };
 
   https.createServer(options, app).listen(port, () => {
-    console.log(`HTTPS 서버가 https://localhost:${port} 에서 실행 중입니다.`);
+    logger.info(`HTTPS 서버가 https://localhost:${port} 에서 실행 중입니다.`);
   });
 } catch (error) {
-  console.error('HTTPS 서버를 시작하지 못했습니다. key.pem 또는 cert.pem 파일이 있는지 확인하세요.');
-  console.error('개발용 자체 서명 인증서 생성 방법:');
-  console.error('openssl genrsa -out key.pem 2048');
-  console.error('openssl req -new -key key.pem -out csr.pem');
-  console.error('openssl x509 -req -days 365 -in csr.pem -signkey key.pem -out cert.pem');
-  console.log('\nHTTP 서버를 대신 시작합니다 (테스트용).');
+  logger.error('HTTPS 서버를 시작하지 못했습니다. key.pem 또는 cert.pem 파일이 있는지 확인하세요.', error);
+  logger.error('개발용 자체 서명 인증서 생성 방법:');
+  logger.error('openssl genrsa -out key.pem 2048');
+  logger.error('openssl req -new -key key.pem -out csr.pem');
+  logger.error('openssl x509 -req -days 365 -in csr.pem -signkey key.pem -out cert.pem');
+  logger.info('\nHTTP 서버를 대신 시작합니다 (테스트용).');
   app.listen(port, () => {
-    console.log(`HTTP 서버가 http://localhost:${port} 에서 실행 중입니다.`);
+    logger.info(`HTTP 서버가 http://localhost:${port} 에서 실행 중입니다.`);
   });
 }
