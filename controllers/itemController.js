@@ -49,7 +49,7 @@ export const updateItemById = async (req, res, next) => {
   const userId = req.user.id; // 요청을 보낸 사용자 ID
 
   if (name === undefined && description === undefined) { // service에서 name이 빈 문자열일 수 있으므로 undefined로 체크
-    return res.status(400).json(errorResponse(ERROR_CODES[4000], 'Nothing to update. Provide name or description.'));
+    return errorResponse(res, 'Nothing to update. Provide name or description.', 400, ERROR_CODES[4000]);
   }
 
   try {

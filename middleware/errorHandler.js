@@ -7,7 +7,11 @@ const errorHandler = (err, req, res, next) => {
   logger.error('Error caught by errorHandler:', err.stack);
 
   if (err instanceof ServiceError) {
-    return errorResponse(res, err.message, err.statusCode, err.errorCode);
+    return res.status(err.statusCode || 500).json({
+      resultCode: err.errorCode || -1,
+      resultMessage: err.message,
+      data: null,
+    });
   }
 
   // 일반적인 서버 오류

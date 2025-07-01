@@ -18,13 +18,17 @@ export const getTestData = (req, res) => {
  * POST /test/korean-test
  * 요청 본문에서 한글 텍스트를 받아 응답으로 돌려줍니다.
  */
-export const handleKoreanInput = (req, res) => {
+export const handleKoreanInput = (req, res, next) => {
   const { text } = req.body;
-  if (!text) {
-    return res.status(400).json({ message: '텍스트를 입력해주세요.' });
+  try {
+    if (!text) {
+      return errorResponse(res, '텍스트를 입력해주세요.', 400, ERROR_CODES[1001]);
+    }
+    successResponse(res, 'Korean text received successfully.', {
+      receivedText: text,
+      message: '한글 텍스트가 성공적으로 수신되었습니다.',
+    });
+  } catch (error) {
+    next(error);
   }
-  successResponse(res, 'Korean text received successfully.', {
-    receivedText: text,
-    message: '한글 텍스트가 성공적으로 수신되었습니다.',
-  });
 };

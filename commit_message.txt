@@ -1,4 +1,4 @@
-Fix: Prevent server crashes on /files/upload by improving error handling.
+Fix: Resolve Internal Server Error on /auth/token endpoint.
 
-- Modified routes/fileRoutes.js to pass Multer errors to the global error handler.
-- Modified controllers/fileController.js to pass all caught errors to the global error handler via next(error).
+- Added try...catch block to login function in authController.js to catch and forward errors to the global error handler.
+- Removed debugging console logs.

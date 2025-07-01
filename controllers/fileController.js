@@ -25,30 +25,30 @@ export const upload = async (req, res) => {
     }
 };
 
-export const download = async (req, res) => {
+export const download = async (req, res, next) => {
     try {
         const { id } = req.params;
         const fileRecord = await FileService.getFileById(id);
 
         if (!fileRecord) {
-            errorResponse(res, 'File not found', 404);
+            return errorResponse(res, 'File not found', 404);
         }
 
         const filePath = path.resolve(fileRecord.file_path);
 
         if (!fs.existsSync(filePath)) {
-            errorResponse(res, 'File not found on server', 404);
+            return errorResponse(res, 'File not found on server', 404);
         }
 
         res.download(filePath, fileRecord.original_name, (err) => {
             if (err) {
                 console.error('Error downloading file:', err);
-                errorResponse(res, 'Failed to download file', 500);
+                next(err);
             }
         });
     } catch (error) {
         console.error('Error in download controller:', error);
-        errorResponse(res, 'Failed to download file', 500);
+        next(error);
     }
 };
 
