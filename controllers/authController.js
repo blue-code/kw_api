@@ -65,8 +65,8 @@ export const validateToken = (req, res) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    res.status(200).json(successResponse({ user: decoded }, 'Token is valid.'));
+    successResponse(res, 'Token is valid.', { user: decoded });
   } catch (error) {
-    res.status(401).json(errorResponse(2003, 'Token is invalid or expired.', error.message));
+    errorResponse(res, 'Token is invalid or expired.', 401, 2003, error.message);
   }
 };

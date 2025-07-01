@@ -2,6 +2,7 @@
 import * as itemService from '../services/itemService.js';
 import { successResponse, errorResponse } from '../utils/responseHandler.js';
 import { ERROR_CODES } from '../config/errorCodes.js';
+import logger from "../config/logger.js";
 
 // POST /items - 새 아이템 생성
 export const createItem = async (req, res, next) => {
@@ -24,7 +25,7 @@ export const createItem = async (req, res, next) => {
 export const getAllItems = async (req, res, next) => {
   try {
     const items = await itemService.findAllItems();
-    res.status(200).json(successResponse(items));
+    successResponse(res, null, items);
   } catch (error) {
     next(error);
   }
@@ -35,7 +36,9 @@ export const getItemById = async (req, res, next) => {
   const { id } = req.params;
   try {
     const item = await itemService.findItemById(id);
-    res.status(200).json(successResponse(item));
+    console.log('Inside getItemById - res object keys:', Object.keys(res));
+    console.log('Inside getItemById - res.status type:', typeof res.status);
+    successResponse(res, null, item);
   } catch (error) {
     next(error);
   }
@@ -53,7 +56,7 @@ export const updateItemById = async (req, res, next) => {
 
   try {
     const updatedItem = await itemService.updateExistingItem(id, userId, { name, description });
-    res.status(200).json(successResponse(updatedItem, 'Item updated successfully.'));
+    successResponse(res, 'Item updated successfully.', updatedItem);
   } catch (error) {
     next(error);
   }
@@ -66,7 +69,7 @@ export const deleteItemById = async (req, res, next) => {
 
   try {
     const result = await itemService.deleteExistingItem(id, userId);
-    res.status(200).json(successResponse(result, 'Item deleted successfully.'));
+    successResponse(res, 'Item deleted successfully.', result);
   } catch (error) {
     next(error);
   }
@@ -76,7 +79,7 @@ export const deleteItemById = async (req, res, next) => {
 export const getAllItemsWithStoreInfo = async (req, res, next) => {
   try {
     const itemsWithStores = await itemService.findAllItemsWithStoreDetails();
-    res.status(200).json(successResponse(itemsWithStores));
+    successResponse(res, null, itemsWithStores);
   } catch (error) {
     next(error);
   }
@@ -87,20 +90,26 @@ export const getAllItemsWithStoreInfo = async (req, res, next) => {
 export const getAllItemsWithStoreInfoCustomSQL = async (req, res, next) => {
   try {
     const itemsWithStores = await itemService.findAllItemsWithStoreDetailsCustomSQL();
-    res.status(200).json(successResponse(itemsWithStores));
+    successResponse(res, null, itemsWithStores);
   } catch (error) {
     next(error);
   }
 };
 
 export const getPaginatedItemsController = async (req, res, next) => {
-  const page = parseInt(req.query.page) || 1;
+  let page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
+
+  // 페이지 번호가 1보다 작으면 1로 설정
+  if (page < 1) {
+    page = 1;
+  }
 
   try {
     const result = await itemService.getPaginatedItems(page, limit);
-    res.status(200).json(successResponse(result));
+    successResponse(res, null, result);
   } catch (error) {
+    logger.error(error)
     next(error);
   }
 };
@@ -111,7 +120,7 @@ export const getPaginatedItemsCustomSQLController = async (req, res, next) => {
 
   try {
     const result = await itemService.getPaginatedItemsCustomSQL(page, limit);
-    res.status(200).json(successResponse(result));
+    successResponse(res, undefined, result);
   } catch (error) {
     next(error);
   }

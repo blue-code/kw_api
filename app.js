@@ -12,6 +12,7 @@ dotenv.config();
 
 // 데이터베이스 연결 테스트
 testConnection();
+logger.info('Logger initialized and working.');
 
 const app = express();
 const port = process.env.PORT || 3001; // HTTPS 기본 포트는 443이지만, 개발 편의상 다른 포트 사용

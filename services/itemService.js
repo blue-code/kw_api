@@ -161,8 +161,11 @@ export const findAllItemsWithStoreDetailsCustomSQL = async () => {
 };
 
 export const getPaginatedItems = async (page, limit) => {
+  logger.info(`[ItemService] getPaginatedItems called with page: ${page}, limit: ${limit}`);
+  logger.info('[ItemService] Before calling findPaginatedItems');
   try {
     const result = await itemRepository.findPaginatedItems(page, limit);
+    logger.info(`[ItemService] getPaginatedItems - Repository returned totalItems: ${result.totalItems}`);
     return result;
   } catch (error) {
     logger.error('Service Error fetching paginated items:', error.message);

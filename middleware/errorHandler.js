@@ -13,7 +13,11 @@ const errorHandler = (err, req, res, next) => {
   // 일반적인 서버 오류
   const errorCode = 1000; // Internal Server Error
   const errorMessage = ERROR_CODES[errorCode];
-  errorResponse(res, errorMessage, 500, errorCode);
+  res.status(500).json({
+    resultCode: errorCode,
+    resultMessage: errorMessage,
+    data: null,
+  });
 };
 
 export default errorHandler;

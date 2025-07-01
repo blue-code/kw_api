@@ -74,13 +74,17 @@ class ItemRepository {
 
   async findPaginatedItems(page, limit) {
     const offset = (page - 1) * limit;
-    const { count, rows } = await Item.findAndCountAll({
-      limit: limit,
-      offset: offset,
-      include: ['stores'],
-      order: [['createdAt', 'DESC']],
-    });
-    return { items: rows, totalItems: count, currentPage: page, totalPages: Math.ceil(count / limit) };
+    try {
+      const { count, rows } = await Item.findAndCountAll({
+        limit: limit,
+        offset: offset,
+        include: ['stores'],
+        order: [['createdAt', 'DESC']],
+      });
+      return { items: rows, totalItems: count, currentPage: page, totalPages: Math.ceil(count / limit) };
+    } catch (error) {
+      throw error; // 에러를 다시 던져서 상위 서비스 레이어에서 처리하도록 함
+    }
   }
 
   async findPaginatedItemsCustomSQL(page, limit) {
