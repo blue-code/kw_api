@@ -1,1 +1,4 @@
-Fix: Ensure successResponse message is 'Success' by default in itemController.js
+Fix: Prevent server crashes on /files/upload by improving error handling.
+
+- Modified routes/fileRoutes.js to pass Multer errors to the global error handler.
+- Modified controllers/fileController.js to pass all caught errors to the global error handler via next(error).

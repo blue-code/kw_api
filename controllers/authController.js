@@ -23,31 +23,31 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
  * body: { username, password }
  */
 
-export const login = (req, res) => {
+export const login = (req, res, next) => {
   const { username, password } = req.body;
 
-  if (!username || !password) {
-    return res.status(400).json(errorResponse(1001, 'Username and password are required.'));
+  try {
+    if (!username || !password) {
+      return errorResponse(res, 'Username and password are required.', 400, 1001);
+    }
+
+    const user = users.find(u => u.username === username);
+    if (!user) {
+      return errorResponse(res, 'Invalid credentials.', 401, 2001);
+    }
+
+    if (user.password !== password) {
+      return errorResponse(res, 'Invalid credentials.', 401, 2001);
+    }
+
+    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, {
+      expiresIn: JWT_EXPIRES_IN,
+    });
+
+    successResponse(res, 'Login successful', { token, expiresIn: JWT_EXPIRES_IN });
+  } catch (error) {
+    next(error);
   }
-
-  // 임시 사용자 데이터에서 사용자 찾기
-  const user = users.find(u => u.username === username);
-
-  if (!user) {
-    return res.status(401).json(errorResponse(2001, 'Invalid credentials.'));
-  }
-
-  // 비밀번호 비교 (실제 환경에서는 bcrypt.compareSync 사용)
-  if (user.password !== password) {
-    return res.status(401).json(errorResponse(2001, 'Invalid credentials.'));
-  }
-
-  // JWT 생성
-  const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
-  });
-
-  res.status(200).json(successResponse({ token, expiresIn: JWT_EXPIRES_IN }, 'Login successful'));
 };
 
 /**
@@ -56,17 +56,17 @@ export const login = (req, res) => {
  * body: { token }
  */
 
-export const validateToken = (req, res) => {
+export const validateToken = (req, res, next) => {
   const { token } = req.body;
 
-  if (!token) {
-    return res.status(400).json(errorResponse(1001, 'Token is required.'));
-  }
-
   try {
+    if (!token) {
+      return errorResponse(res, 'Token is required.', 400, 1001);
+    }
+
     const decoded = jwt.verify(token, JWT_SECRET);
     successResponse(res, 'Token is valid.', { user: decoded });
   } catch (error) {
-    errorResponse(res, 'Token is invalid or expired.', 401, 2003, error.message);
+    next(error);
   }
 };
