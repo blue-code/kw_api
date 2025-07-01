@@ -1,18 +1,17 @@
 import { ERROR_CODES } from '../config/errorCodes.js';
 
-export const successResponse = (data, message = 'Success', resultCode = 0) => {
-  return {
-    resultCode: resultCode,
+export const successResponse = (res, message = 'Success', data = null, statusCode = 200) => {
+  return res.status(statusCode).json({
+    resultCode: 0,
     resultMessage: message,
     data: data,
-  };
+  });
 };
 
-export const errorResponse = (errorCode, errorMessage, data = null) => {
-  const message = errorMessage || ERROR_CODES[errorCode] || 'Unknown Error';
-  return {
+export const errorResponse = (res, message = 'Error', statusCode = 500, errorCode = -1, data = null) => {
+  return res.status(statusCode).json({
     resultCode: errorCode,
     resultMessage: message,
     data: data,
-  };
+  });
 };

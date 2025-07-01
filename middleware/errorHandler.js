@@ -7,13 +7,13 @@ const errorHandler = (err, req, res, next) => {
   logger.error('Error caught by errorHandler:', err.stack);
 
   if (err instanceof ServiceError) {
-    return res.status(err.statusCode).json(errorResponse(err.errorCode, err.message));
+    return errorResponse(res, err.message, err.statusCode, err.errorCode);
   }
 
   // 일반적인 서버 오류
   const errorCode = 1000; // Internal Server Error
   const errorMessage = ERROR_CODES[errorCode];
-  res.status(500).json(errorResponse(errorCode, errorMessage));
+  errorResponse(res, errorMessage, 500, errorCode);
 };
 
 export default errorHandler;

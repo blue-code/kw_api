@@ -136,6 +136,9 @@
 | `PUT`  | `/items/:id`          | 아이템 정보 수정         |     ✅     |
 | `DELETE`| `/items/:id`         | 아이템 삭제              |     ✅     |
 | `GET`  | `/test`               | 보호된 테스트 라우트     |     ✅     |
+| `POST` | `/files/upload`       | 파일 업로드              |     ❌     |
+| `GET`  | `/files/images/:filename` | 이미지 파일 제공         |     ❌     |
+| `GET`  | `/files/download/:filename` | 파일 다운로드            |     ❌     |
 
 ## scripts
 

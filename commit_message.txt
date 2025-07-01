@@ -1,0 +1,6 @@
+feat: Resolve Korean filename issues and refactor file handling
+
+- Fix: Correctly handle Korean filenames during file upload by decoding originalname from latin1 to utf8 in controller.
+- Refactor: Update file upload middleware to remove redundant filename decoding.
+- Refactor: Change image serving and file download routes to use file ID instead of filename for better uniqueness and consistency.
+- Chore: Add 'uploads/' directory and 'development.sqlite' to .gitignore.

@@ -17,6 +17,12 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+# Uploaded files
+uploads/
+
+# Database files
+development.sqlite
+
 # OS generated files
 .DS_Store
 .DS_Store?

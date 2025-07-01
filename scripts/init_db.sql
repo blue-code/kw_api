@@ -59,4 +59,19 @@ CREATE TABLE item_stores (
 -- FOREIGN KEY (user_id) REFERENCES users(id)
 -- ON DELETE SET NULL; -- 사용자가 삭제될 경우 아이템의 user_id를 NULL로 설정하거나, ON DELETE CASCADE로 아이템도 함께 삭제
 
+-- files 테이블이 존재하면 삭제합니다.
+DROP TABLE IF EXISTS files;
+
+-- files 테이블을 생성합니다.
+CREATE TABLE files (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    original_name VARCHAR(255) NOT NULL,
+    file_name VARCHAR(255) NOT NULL UNIQUE,
+    file_path VARCHAR(255) NOT NULL,
+    file_size INT NOT NULL,
+    file_type VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 SELECT '데이터베이스 및 테이블 초기화 완료.' AS message;
