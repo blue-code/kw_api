@@ -15,7 +15,7 @@ export const createItem = async (req, res, next) => {
 
   try {
     const newItem = await itemService.createNewItem(name, description, userId);
-    res.status(201).json(successResponse(newItem, 'Item created successfully.'));
+    successResponse(res, 'Item created successfully.', newItem, 201);
   } catch (error) {
     next(error);
   }
@@ -25,7 +25,7 @@ export const createItem = async (req, res, next) => {
 export const getAllItems = async (req, res, next) => {
   try {
     const items = await itemService.findAllItems();
-    successResponse(res, null, items);
+    successResponse(res, undefined, items);
   } catch (error) {
     next(error);
   }
@@ -36,9 +36,7 @@ export const getItemById = async (req, res, next) => {
   const { id } = req.params;
   try {
     const item = await itemService.findItemById(id);
-    console.log('Inside getItemById - res object keys:', Object.keys(res));
-    console.log('Inside getItemById - res.status type:', typeof res.status);
-    successResponse(res, null, item);
+    successResponse(res, undefined, item);
   } catch (error) {
     next(error);
   }
@@ -56,7 +54,7 @@ export const updateItemById = async (req, res, next) => {
 
   try {
     const updatedItem = await itemService.updateExistingItem(id, userId, { name, description });
-    successResponse(res, 'Item updated successfully.', updatedItem);
+        successResponse(res, 'Item updated successfully.', updatedItem);
   } catch (error) {
     next(error);
   }
@@ -79,7 +77,7 @@ export const deleteItemById = async (req, res, next) => {
 export const getAllItemsWithStoreInfo = async (req, res, next) => {
   try {
     const itemsWithStores = await itemService.findAllItemsWithStoreDetails();
-    successResponse(res, null, itemsWithStores);
+    successResponse(res, undefined, itemsWithStores);
   } catch (error) {
     next(error);
   }
@@ -90,7 +88,7 @@ export const getAllItemsWithStoreInfo = async (req, res, next) => {
 export const getAllItemsWithStoreInfoCustomSQL = async (req, res, next) => {
   try {
     const itemsWithStores = await itemService.findAllItemsWithStoreDetailsCustomSQL();
-    successResponse(res, null, itemsWithStores);
+    successResponse(res, undefined, itemsWithStores);
   } catch (error) {
     next(error);
   }
@@ -107,7 +105,7 @@ export const getPaginatedItemsController = async (req, res, next) => {
 
   try {
     const result = await itemService.getPaginatedItems(page, limit);
-    successResponse(res, null, result);
+    successResponse(res, undefined, result);
   } catch (error) {
     logger.error(error)
     next(error);
