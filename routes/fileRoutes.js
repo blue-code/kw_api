@@ -7,12 +7,9 @@ const router = express.Router();
 // 파일 업로드 (단일 파일)
 router.post('/upload', (req, res, next) => {
   uploadMiddleware.single('file')(req, res, (err) => {
-    if (err instanceof multer.MulterError) {
-      // Multer 에러 처리
-      return res.status(500).json({ resultCode: -1, resultMessage: err.message });
-    } else if (err) {
-      // 일반적인 에러 처리
-      return res.status(500).json({ resultCode: -1, resultMessage: 'An unknown error occurred during file upload.' });
+    if (err) {
+      // Multer 에러를 포함한 모든 에러를 전역 에러 핸들러로 전달
+      return next(err);
     }
     next();
   });

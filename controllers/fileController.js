@@ -52,29 +52,29 @@ export const download = async (req, res) => {
     }
 };
 
-export const serveImage = async (req, res) => {
+export const serveImage = async (req, res, next) => {
     try {
         const { id } = req.params;
         const fileRecord = await FileService.getFileById(id);
 
         if (!fileRecord) {
-            errorResponse(res, 'Image not found', 404);
+            return errorResponse(res, 'Image not found', 404);
         }
 
         // Check if the file is an image
         if (!fileRecord.file_type.startsWith('image/')) {
-            errorResponse(res, 'Not an image file', 400);
+            return errorResponse(res, 'Not an image file', 400);
         }
 
         const filePath = path.resolve(fileRecord.file_path);
 
         if (!fs.existsSync(filePath)) {
-            errorResponse(res, 'Image file not found on server', 404);
+            return errorResponse(res, 'Image file not found on server', 404);
         }
 
         res.sendFile(filePath);
     } catch (error) {
         console.error('Error serving image:', error);
-        errorResponse(res, 'Failed to serve image', 500);
+        next(error);
     }
 };

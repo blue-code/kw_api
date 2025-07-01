@@ -1,1 +1,1 @@
-Fix: Ensure successResponse message is always Success or specified, and resolve res.status not a function errors.
+Fix: Ensure successResponse message is 'Success' by default in itemController.js
