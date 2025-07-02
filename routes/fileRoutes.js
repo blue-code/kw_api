@@ -1,11 +1,11 @@
 // Express 프레임워크를 가져옵니다.
 import express from 'express';
 // 파일 관련 컨트롤러 함수들을 가져옵니다.
-import { upload, download, serveImage } from '../controllers/fileController.js';
+import { upload, download, serveImage, uploadMultiple } from '../controllers/fileController.js';
 // 파일 업로드를 처리하기 위한 Multer 미들웨어를 가져옵니다.
 // Multer는 multipart/form-data 형식의 요청을 처리하는 데 사용됩니다.
 // Java Spring에서 파일 업로드를 처리할 때 MultipartFile 객체를 사용하는 것과 유사합니다.
-import uploadMiddleware from '../middleware/uploadMiddleware.js';
+import { uploadMiddleware, uploadMultipleMiddleware } from '../middleware/uploadMiddleware.js';
 
 // Express의 Router 객체를 생성합니다.
 // 이 파일에서 정의된 라우트들은 app.js에서 '/files' 접두사로 등록됩니다.
@@ -34,6 +34,25 @@ router.post(
   // 2. 파일 업로드 후 실행될 컨트롤러 함수입니다.
   //    이 함수는 fileController.js에 정의되어 있으며, 업로드된 파일 정보를 받아 처리합니다.
   upload
+);
+
+// HTTP POST 요청을 '/files/upload-multiple' 경로로 보낼 때 실행될 핸들러를 정의합니다.
+// 이 경로는 클라이언트로부터 여러 파일을 업로드 받는 데 사용됩니다.
+router.post(
+  '/upload-multiple',
+  // Multer 미들웨어를 사용하여 여러 파일 업로드를 처리합니다.
+  // uploadMultipleMiddleware.array('files')는 'files'라는 이름의 필드로 전송된 여러 파일을 처리합니다.
+  // 업로드된 파일 정보는 req.files 배열에 저장됩니다.
+  (req, res, next) => {
+    uploadMultipleMiddleware.array('files')(req, res, (err) => {
+      if (err) {
+        return next(err);
+      }
+      next();
+    });
+  },
+  // 여러 파일 업로드 후 실행될 컨트롤러 함수입니다.
+  uploadMultiple
 );
 
 // HTTP GET 요청을 '/files/images/:id' 경로로 보낼 때 실행될 핸들러를 정의합니다.

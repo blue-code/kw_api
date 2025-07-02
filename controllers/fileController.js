@@ -66,6 +66,47 @@ export const upload = async (req, res, next) => { // next 추가 고려
 };
 
 /**
+ * 여러 파일 업로드 요청을 처리합니다.
+ * HTTP POST '/files/upload-multiple' 경로로 요청이 오면 실행됩니다.
+ * Multer 미들웨어에 의해 파일들이 먼저 처리되고, 그 결과가 req.files 배열에 담겨 전달됩니다.
+ *
+ * @param {object} req - Express 요청 객체. req.files에 업로드된 파일 정보 배열이 포함됩니다.
+ * @param {object} res - Express 응답 객체.
+ * @param {function} next - 다음 미들웨어 함수.
+ */
+export const uploadMultiple = async (req, res, next) => {
+    try {
+        // req.files 배열은 Multer 미들웨어가 성공적으로 파일들을 처리했을 때 생성됩니다.
+        // 파일이 업로드되지 않았거나 Multer 설정에 문제가 있으면 req.files가 없거나 비어있을 수 있습니다.
+        if (!req.files || req.files.length === 0) {
+            return errorResponse(res, 'No files uploaded', 400);
+        }
+
+        const uploadedFiles = [];
+        // 업로드된 각 파일에 대해 반복 처리합니다.
+        for (const file of req.files) {
+            const fileData = {
+                original_name: Buffer.from(file.originalname, 'latin1').toString('utf8'),
+                file_name: file.filename,
+                file_path: file.path,
+                file_size: file.size,
+                file_type: file.mimetype,
+            };
+            // 각 파일의 메타데이터를 데이터베이스에 저장하고, 저장된 정보를 배열에 추가합니다.
+            const newFile = await FileService.createFile(fileData);
+            uploadedFiles.push(newFile);
+        }
+
+        // 201 Created 상태 코드와 함께 성공 응답을 보냅니다.
+        // 업로드된 모든 파일의 메타데이터 정보를 포함합니다.
+        successResponse(res, 'Files uploaded successfully', uploadedFiles, 201);
+    } catch (error) {
+        console.error('Error uploading multiple files:', error);
+        errorResponse(res, 'Failed to upload multiple files', 500);
+    }
+};
+
+/**
  * 파일 다운로드 요청을 처리합니다.
  * HTTP GET '/files/download/:id' 경로로 요청이 오면 실행됩니다.
  * ':id'는 다운로드할 파일의 데이터베이스 ID입니다.
