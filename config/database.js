@@ -11,7 +11,12 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     port: process.env.DB_PORT || 3306,
     dialect: 'mysql',
-    logging: console.log, // 모든 SQL 쿼리를 콘솔에 로깅
+    logging: (sql, queryObject) => {
+      console.log(sql);
+      if (queryObject && queryObject.bind) {
+        console.log('Parameters: ', queryObject.bind);
+      }
+    },
     dialectOptions: {
       charset: 'utf8mb4',
     },
