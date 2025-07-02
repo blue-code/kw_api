@@ -86,6 +86,19 @@ class FileService {
         }
         return false; // 해당 ID의 파일 메타데이터가 존재하지 않음
     }
+
+    /**
+     * group_id를 기준으로 여러 파일 메타데이터를 데이터베이스에서 조회합니다.
+     *
+     * @static
+     * @async
+     * @param {string} groupId - 조회할 파일들의 group_id.
+     * @returns {Promise<Array<object>>} 조회된 파일 메타데이터 객체 배열.
+     * @throws {Error} Sequelize 작업 중 발생할 수 있는 데이터베이스 오류.
+     */
+    static async getFilesByGroupId(groupId) {
+        return await db.File.findAll({ where: { group_id: groupId } });
+    }
 }
 
 // FileService 클래스를 모듈의 기본 내보내기(default export)로 설정합니다.

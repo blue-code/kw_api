@@ -28,6 +28,10 @@ const File = sequelize.define('File', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    group_id: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
     created_at: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,

@@ -9,6 +9,8 @@ import path from 'path';
 // 파일 시스템 작업을 위한 Node.js 내장 모듈입니다. (파일 존재 여부 확인 등)
 // Java의 java.io.File 클래스의 메서드들과 유사합니다.
 import fs from 'fs';
+// ZIP 압축을 위한 archiver 라이브러리를 가져옵니다.
+import archiver from 'archiver';
 
 /**
  * 파일 업로드 요청을 처리합니다.
@@ -82,6 +84,8 @@ export const uploadMultiple = async (req, res, next) => {
             return errorResponse(res, 'No files uploaded', 400);
         }
 
+        const { group_id } = req.body; // group_id를 요청 본문에서 가져옵니다.
+
         const uploadedFiles = [];
         // 업로드된 각 파일에 대해 반복 처리합니다.
         for (const file of req.files) {
@@ -91,6 +95,7 @@ export const uploadMultiple = async (req, res, next) => {
                 file_path: file.path,
                 file_size: file.size,
                 file_type: file.mimetype,
+                group_id: group_id || null, // group_id가 없으면 null로 저장
             };
             // 각 파일의 메타데이터를 데이터베이스에 저장하고, 저장된 정보를 배열에 추가합니다.
             const newFile = await FileService.createFile(fileData);
@@ -209,6 +214,68 @@ export const serveImage = async (req, res, next) => {
         });
     } catch (error) {
         console.error('Error in serveImage controller:', error);
+        next(error);
+    }
+};
+
+/**
+ * group_id를 기준으로 여러 파일을 ZIP으로 압축하여 다운로드합니다.
+ * HTTP GET '/files/download-multiple/:group_id' 경로로 요청이 오면 실행됩니다.
+ *
+ * @param {object} req - Express 요청 객체. req.params.group_id로 group_id를 가져옵니다.
+ * @param {object} res - Express 응답 객체.
+ * @param {function} next - Express 다음 미들웨어 함수 (오류 처리용).
+ */
+export const downloadMultiple = async (req, res, next) => {
+    try {
+        const { group_id } = req.params; // URL 경로에서 group_id 추출
+
+        if (!group_id) {
+            return errorResponse(res, 'Group ID is required', 400);
+        }
+
+        // FileService를 통해 데이터베이스에서 해당 group_id의 모든 파일 정보를 조회합니다.
+        const fileRecords = await FileService.getFilesByGroupId(group_id);
+
+        if (!fileRecords || fileRecords.length === 0) {
+            return errorResponse(res, 'No files found for the given group ID', 404);
+        }
+
+        // archiver 라이브러리를 사용하여 ZIP 아카이브를 생성합니다.
+        const archive = archiver('zip', {
+            zlib: { level: 9 } // 압축 레벨 설정
+        });
+
+        // 응답 헤더 설정: ZIP 파일 다운로드
+        res.attachment(`${group_id}.zip`);
+        archive.pipe(res); // 아카이브를 응답 스트림으로 파이프
+
+        for (const fileRecord of fileRecords) {
+            const filePath = path.resolve(fileRecord.file_path);
+
+            if (fs.existsSync(filePath)) {
+                // 실제 파일을 아카이브에 추가합니다. 파일 이름은 original_name을 사용합니다.
+                archive.file(filePath, { name: fileRecord.original_name });
+            } else {
+                console.warn(`File not found on server, skipping: ${filePath}`);
+            }
+        }
+
+        archive.finalize(); // 아카이브 생성 완료
+
+        archive.on('error', (err) => {
+            console.error('Archiver error:', err);
+            next(err); // 오류 발생 시 Express 오류 핸들러로 전달
+        });
+
+        // 클라이언트 연결이 끊겼을 때 아카이브 스트림도 종료
+        res.on('close', () => {
+            console.log('Client disconnected, archive stream closed.');
+            archive.destroy(); // 스트림 리소스 해제
+        });
+
+    } catch (error) {
+        console.error('Error in downloadMultiple controller:', error);
         next(error);
     }
 };

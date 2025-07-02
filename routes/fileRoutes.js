@@ -1,7 +1,7 @@
 // Express 프레임워크를 가져옵니다.
 import express from 'express';
 // 파일 관련 컨트롤러 함수들을 가져옵니다.
-import { upload, download, serveImage, uploadMultiple } from '../controllers/fileController.js';
+import { upload, download, serveImage, uploadMultiple, downloadMultiple } from '../controllers/fileController.js';
 // 파일 업로드를 처리하기 위한 Multer 미들웨어를 가져옵니다.
 // Multer는 multipart/form-data 형식의 요청을 처리하는 데 사용됩니다.
 // Java Spring에서 파일 업로드를 처리할 때 MultipartFile 객체를 사용하는 것과 유사합니다.
@@ -68,6 +68,11 @@ router.get('/images/:id', serveImage);
 // Java Spring의 @GetMapping("/download/{id}") 와 유사하며,
 // 응답 헤더에 Content-Disposition: attachment 를 설정하여 다운로드를 유도합니다.
 router.get('/download/:id', download);
+
+// HTTP GET 요청을 '/files/download-multiple/:group_id' 경로로 보낼 때 실행될 핸들러를 정의합니다.
+// ':group_id'는 경로 파라미터입니다.
+// 이 경로는 특정 group_id를 가진 파일들을 ZIP으로 압축하여 클라이언트가 다운로드할 수 있도록 제공합니다.
+router.get('/download-multiple/:group_id', downloadMultiple);
 
 // 설정된 라우터 객체를 모듈 외부로 내보냅니다.
 export default router;

@@ -70,6 +70,7 @@ CREATE TABLE files (
     file_path VARCHAR(255) NOT NULL,
     file_size INT NOT NULL,
     file_type VARCHAR(255) NOT NULL,
+    group_id VARCHAR(255), -- group_id 컬럼 추가 (비필수)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
