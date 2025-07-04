@@ -15,8 +15,8 @@ const errorHandler = (err, req, res, next) => {
   }
 
   // 일반적인 서버 오류
-  const errorCode = 1000; // Internal Server Error
-  const errorMessage = ERROR_CODES[errorCode];
+  const errorCode = ERROR_CODES.GENERAL.INTERNAL_SERVER_ERROR;
+  const errorMessage = 'Internal Server Error'; // 직접 메시지 사용 또는 다른 방식
   res.status(500).json({
     resultCode: errorCode,
     resultMessage: errorMessage,

@@ -98,10 +98,10 @@ export const login = (req, res, next) => {
  * @param {function} next - Express 다음 미들웨어 함수
  */
 export const validateToken = (req, res, next) => {
-  // 요청 본문에서 token을 추출합니다.
-  const { token } = req.body;
-
   try {
+    // 요청 본문에서 token을 추출합니다.
+    const { token } = req.body;
+
     // 토큰이 제공되지 않았는지 확인합니다.
     if (!token) {
       return errorResponse(res, 'Token is required.', 400, ERROR_CODES.VALIDATION.MISSING_TOKEN);
@@ -116,10 +116,27 @@ export const validateToken = (req, res, next) => {
     successResponse(res, 'Token is valid.', { user: decoded });
   } catch (error) {
     // jwt.verify()에서 발생하는 예외 (JsonWebTokenError, TokenExpiredError 등)를 처리합니다.
-    // 이 예외들은 Express의 오류 처리 미들웨어로 전달되어 적절한 HTTP 상태 코드와 함께 응답됩니다.
-    // (예: TokenExpiredError는 401 Unauthorized, JsonWebTokenError는 401 또는 403)
-    // authMiddleware.js의 verifyToken 함수에서도 유사한 로직이 사용되지만,
-    // 이 validateToken 컨트롤러는 명시적으로 토큰 유효성을 확인하는 API 엔드포인트 역할을 합니다.
+    if (error.name === 'TokenExpiredError') {
+      return errorResponse(res, 'Token expired.', 401, ERROR_CODES.AUTH.TOKEN_EXPIRED);
+    }
+    if (error.name === 'JsonWebTokenError') {
+      return errorResponse(res, 'Invalid token.', 401, ERROR_CODES.AUTH.INVALID_TOKEN);
+    }
+    // 그 외의 오류는 다음 오류 처리 미들웨어로 전달합니다.
+    next(error);
+  }
+};
+
+export const getServiceToken = (req, res, next) => {
+  try {
+    const serviceToken = jwt.sign(
+      { service: 'authenticated_service' },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN },
+    );
+
+    successResponse(res, 'Service token generated successfully', { token: serviceToken, expiresIn: JWT_EXPIRES_IN });
+  } catch (error) {
     next(error);
   }
 };

@@ -47,6 +47,12 @@ app.use(cors());
 // Java Spring의 @RequestBody 어노테이션과 유사한 기능을 제공합니다.
 app.use(express.json());
 
+// 모든 요청을 로깅하는 미들웨어 (디버깅용)
+app.use((req, res, next) => {
+  logger.info(`[Request] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 // 각 기능별 라우트(경로) 정의 파일을 가져옵니다.
 // Java Spring의 @Controller나 @RestController 클래스와 유사하게 URL 경로와 해당 경로를 처리할 로직을 매핑합니다.
 import authRoutes from './routes/authRoutes.js'; // 인증 관련 라우트
@@ -59,7 +65,7 @@ import fileRoutes from './routes/fileRoutes.js'; // 파일 관련 라우트
 app.get('/', (req, res) => {
   // req: 요청(request) 객체, 클라이언트로부터 온 정보를 담고 있습니다.
   // res: 응답(response) 객체, 클라이언트에게 보낼 정보를 설정합니다.
-  res.send('API 서버가 실행 중입니다. (HTTPS)'); // 간단한 텍스트 메시지를 응답으로 보냅니다.
+  res.send('API 서버가 실행 중입니다. (HTTP)'); // 메시지를 HTTP로 변경
 });
 
 // 특정 경로 접두사(prefix)에 따라 라우터를 등록합니다.
@@ -76,45 +82,14 @@ import errorHandler from './middleware/errorHandler.js';
 // 등록된 라우트 중에서 일치하는 경로가 없을 경우 처리하는 404 핸들러입니다.
 // 이 미들웨어는 다른 모든 라우트와 미들웨어 뒤에 위치해야 합니다.
 app.use((req, res, next) => {
-  // next: 다음 미들웨어 함수를 호출하는 콜백 함수입니다. 여기서는 사용되지 않습니다.
-  res.status(404).json({ message: 'Not Found' }); // 404 상태 코드와 함께 JSON 응답을 보냅니다.
+  res.status(404).json({ message: 'Not Found' });
 });
 
 // 중앙 집중식 오류 처리 미들웨어입니다.
 // 애플리케이션 전역에서 발생하는 오류를 일관된 방식으로 처리합니다.
-// 이 미들웨어는 일반적으로 모든 미들웨어와 라우트 핸들러의 가장 마지막에 등록합니다.
-// Java Spring의 @ControllerAdvice나 HandlerExceptionResolver와 유사한 역할을 합니다.
 app.use(errorHandler);
 
-// HTTPS 서버를 설정하고 시작합니다.
-// Node.js에서는 http 모듈 또는 https 모듈을 사용하여 서버를 직접 생성하고 실행합니다.
-// TODO: 실제 운영 환경에서는 공인된 기관에서 발급받은 정식 SSL 인증서를 사용해야 합니다.
-// 아래 코드는 개발용으로 자체 서명된 인증서(self-signed certificate)를 사용하는 예시입니다.
-// 'key.pem' (개인 키)과 'cert.pem' (공개 인증서) 파일이 프로젝트 루트 디렉토리에 있어야 합니다.
-try {
-  const options = {
-    // SSL/TLS 연결에 필요한 개인 키와 인증서를 파일에서 읽어옵니다.
-    key: fs.readFileSync('key.pem'), // 동기적으로 파일 읽기
-    cert: fs.readFileSync('cert.pem'), // 동기적으로 파일 읽기
-  };
-
-  // https.createServer()를 사용하여 HTTPS 서버 인스턴스를 생성합니다.
-  // 첫 번째 인자로 SSL 옵션 객체를, 두 번째 인자로 Express 애플리케이션 객체를 전달합니다.
-  // .listen() 메서드로 특정 포트에서 들어오는 연결을 수신 대기합니다.
-  https.createServer(options, app).listen(port, () => {
-    logger.info(`HTTPS 서버가 https://localhost:${port} 에서 실행 중입니다.`);
-  });
-} catch (error) {
-  // 인증서 파일을 찾을 수 없거나 다른 오류가 발생하면 HTTPS 서버 시작에 실패합니다.
-  logger.error('HTTPS 서버를 시작하지 못했습니다. key.pem 또는 cert.pem 파일이 있는지 확인하세요.', error);
-  logger.error('개발용 자체 서명 인증서 생성 방법 (터미널에서 실행):');
-  logger.error('  openssl genrsa -out key.pem 2048'); // 개인 키 생성
-  logger.error('  openssl req -new -key key.pem -out csr.pem'); // 인증서 서명 요청(CSR) 생성
-  logger.error('  openssl x509 -req -days 365 -in csr.pem -signkey key.pem -out cert.pem'); // 자체 서명 인증서 생성
-  logger.info('\nHTTP 서버를 대신 시작합니다 (테스트 및 개발용).');
-  // HTTPS 설정에 실패한 경우, 개발 편의를 위해 HTTP 서버로 대체 실행합니다.
-  // 프로덕션 환경에서는 HTTPS를 강제해야 합니다.
-  app.listen(port, () => {
-    logger.info(`HTTP 서버가 http://localhost:${port} 에서 실행 중입니다.`);
-  });
-}
+// HTTP 서버를 시작합니다.
+app.listen(port, () => {
+  logger.info(`HTTP 서버가 http://localhost:${port} 에서 실행 중입니다.`);
+});

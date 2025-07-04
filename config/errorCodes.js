@@ -1,37 +1,47 @@
 export const ERROR_CODES = {
   // 일반적인 오류
-  1000: 'Internal Server Error',
-  1001: 'Invalid Request Parameter',
-  1002: 'Unauthorized Access',
-  1003: 'Forbidden Access',
-  1004: 'Resource Not Found',
-  1005: 'Database Error',
-  1006: 'Validation Failed',
+  GENERAL: {
+    INTERNAL_SERVER_ERROR: 1000,
+    INVALID_PARAMETER: 1001,
+    UNAUTHORIZED: 1002,
+    FORBIDDEN: 1003,
+    NOT_FOUND: 1004,
+    DATABASE_ERROR: 1005,
+  },
 
-  // 인증 관련 오류 (2xxx)
-  2000: 'Authentication Failed',
-  2001: 'Invalid Credentials',
-  2002: 'Token Expired',
-  2003: 'Invalid Token',
-  2004: 'User Not Found',
-  2005: 'User Already Exists',
+  // 유효성 검사 관련 오류 (2xxx)
+  VALIDATION: {
+    VALIDATION_FAILED: 2000,
+    MISSING_FIELDS: 2001,
+    MISSING_TOKEN: 2002,
+  },
 
-  // 아이템 관련 오류 (3xxx)
-  3000: 'Item Creation Failed',
-  3001: 'Item Not Found',
-  3002: 'Item Update Failed',
-  3003: 'Item Deletion Failed',
-  3004: 'Not Item Owner',
+  // 인증 관련 오류 (3xxx)
+  AUTH: {
+    AUTHENTICATION_FAILED: 3000,
+    INVALID_CREDENTIALS: 3001,
+    TOKEN_EXPIRED: 3002,
+    INVALID_TOKEN: 3003,
+    USER_NOT_FOUND: 3004,
+    USER_ALREADY_EXISTS: 3005,
+  },
 
-  // 기타 비즈니스 로직 오류 (4xxx)
-  4000: 'Nothing to Update',
+  // 아이템 관련 오류 (4xxx)
+  ITEM: {
+    CREATION_FAILED: 4000,
+    NOT_FOUND: 4001,
+    UPDATE_FAILED: 4002,
+    DELETION_FAILED: 4003,
+    NOT_OWNER: 4004,
+    NOTHING_TO_UPDATE: 4005,
+  },
 };
 
 // HTTP 상태 코드와 매핑되는 에러 코드 (선택적)
 export const HTTP_STATUS_ERROR_MAP = {
-  400: 1001, // Bad Request -> Invalid Request Parameter
-  401: 1002, // Unauthorized -> Unauthorized Access
-  403: 1003, // Forbidden -> Forbidden Access
-  404: 1004, // Not Found -> Resource Not Found
-  500: 1000, // Internal Server Error -> Internal Server Error
+  400: ERROR_CODES.GENERAL.INVALID_PARAMETER,
+  401: ERROR_CODES.GENERAL.UNAUTHORIZED,
+  403: ERROR_CODES.GENERAL.FORBIDDEN,
+  404: ERROR_CODES.GENERAL.NOT_FOUND,
+  500: ERROR_CODES.GENERAL.INTERNAL_SERVER_ERROR,
 };

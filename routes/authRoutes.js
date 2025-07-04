@@ -2,7 +2,8 @@
 import express from 'express';
 // 인증 관련 컨트롤러 함수들을 가져옵니다.
 // Java의 @Controller 클래스 내의 메소드들과 유사한 역할을 합니다.
-import { login, validateToken } from '../controllers/authController.js';
+import { login, validateToken, getServiceToken } from '../controllers/authController.js';
+import { verifyApiKey } from '../middleware/authMiddleware.js';
 
 // Express의 Router 객체를 생성합니다.
 // 라우터는 특정 경로에 대한 요청을 처리하는 미들웨어 및 HTTP 메소드 핸들러의 집합입니다.
@@ -22,6 +23,8 @@ router.post('/token', login);
 // validateToken 함수는 authController.js 파일에 정의된 컨트롤러 함수입니다.
 // Java Spring의 @PostMapping("/validate")과 유사합니다.
 router.post('/validate', validateToken);
+
+router.post('/service-token', verifyApiKey, getServiceToken);
 
 // 설정된 라우터 객체를 모듈 외부로 내보냅니다.
 // 이렇게 내보낸 라우터는 app.js에서 애플리케이션의 메인 라우팅 시스템에 통합됩니다.

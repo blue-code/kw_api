@@ -27,7 +27,7 @@ export class ServiceError extends Error {
     // 그래도 없으면 GENERAL.INTERNAL_SERVER_ERROR (예: 1000)를 기본값으로 사용합니다.
     this.errorCode = errorCode || HTTP_STATUS_ERROR_MAP[statusCode] || ERROR_CODES.GENERAL.INTERNAL_SERVER_ERROR;
     // message가 제공되지 않으면, errorCode에 해당하는 메시지를 ERROR_CODES에서 찾거나, 기본 메시지를 사용합니다.
-    this.message = message || (ERROR_CODES[this.errorCode] ? ERROR_CODES[this.errorCode].message : 'An unexpected error occurred in the service layer.');
+    this.message = message || 'An unexpected error occurred in the service layer.';
     this.name = this.constructor.name; // 에러 객체의 이름을 클래스 이름('ServiceError')으로 설정
     Error.captureStackTrace(this, this.constructor); // 스택 트레이스 캡처 (V8 환경)
   }
@@ -291,6 +291,6 @@ export const getPaginatedItemsCustomSQL = async (page, limit) => {
     return result;
   } catch (error) {
     logger.error(`Service Error in getPaginatedItemsCustomSQL (page: ${page}, limit: ${limit}): ${error.message}`, { error });
-    throw new ServiceError(error.message || 'Failed to fetch paginated items using custom SQL.', 500, ERROR_CODES.DB.PAGINATED_FETCH_CUSTOM_SQL_FAILED);
+    throw new ServiceError(error.message || 'Failed to fetch paginated items using custom SQL.', 500, ERROR_CODES.ITEM.FETCH_FAILED);
   }
 };

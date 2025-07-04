@@ -40,7 +40,7 @@ export const handleKoreanInput = (req, res, next) => {
     if (text === undefined || text === null || text.trim() === '') {
       // errorResponse 유틸리티를 사용하여 표준화된 오류 응답을 보냅니다.
       // ERROR_CODES 상수를 사용하여 오류 코드를 명시적으로 지정합니다.
-      return errorResponse(res, '텍스트를 입력해주세요. (Text input is required.)', 400, ERROR_CODES.VALIDATION.MISSING_TEXT_INPUT);
+      return errorResponse(res, '텍스트를 입력해주세요. (Text input is required.)', 400, ERROR_CODES.VALIDATION.MISSING_FIELDS);
     }
 
     // 성공적으로 한글 텍스트를 수신했음을 알리는 응답을 보냅니다.

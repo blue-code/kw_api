@@ -114,7 +114,7 @@ export const updateItemById = async (req, res, next) => {
   // name이 빈 문자열("")로 들어올 수 있는 경우를 고려하여 undefined로 체크합니다.
   // 서비스 계층에서 name이 빈 문자열로 업데이트 되는 것을 허용할 수도, 막을 수도 있습니다.
   if (name === undefined && description === undefined) {
-    return errorResponse(res, 'Nothing to update. Provide name or description.', 400, ERROR_CODES.VALIDATION.NO_UPDATE_DATA);
+    return errorResponse(res, 'Nothing to update. Provide name or description.', 400, ERROR_CODES.ITEM.NOTHING_TO_UPDATE);
   }
 
   try {
